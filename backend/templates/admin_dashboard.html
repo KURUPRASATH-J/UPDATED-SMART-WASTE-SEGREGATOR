@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" sizes="32x32" href="/frontend/assets/images/favicon-32x32.png?v=1">
+<link rel="icon" type="image/png" sizes="16x16" href="/frontend/assets/images/favicon-16x16.png?v=1">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo.png?v=1" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo-dark.png?v=1" media="(prefers-color-scheme: dark)">
+<link rel="shortcut icon" href="/frontend/assets/images/favicon.ico?v=1">
+<link rel="apple-touch-icon" sizes="180x180" href="/frontend/assets/images/apple-touch-icon.png?v=1">
+<meta name="theme-color" content="#091020">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Console - Smart Waste Segregator</title>
+<meta name="description" content="Management console for the Smart Waste Segregator IoT system">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0b0f1a">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+/* Admin Console is deliberately theme-independent: a fixed dark-navy + gold
+   look that reads unmistakably different from the user dashboard (cyan/green). */
+:root{
+  --admin-bg:#0b0f1a;--admin-card:#131a2b;--admin-card2:#0f1526;
+  --admin-border:rgba(255,255,255,0.08);--admin-text:#eef2ff;--admin-sub:#8b95ad;
+  --admin-gold:#f1c40f;--admin-amber:#ff9f1c;--admin-danger:#ff4757;
+  --admin-ok:#2ecc71;--radius:16px;--radius-sm:10px;
+  --topbar-height:64px;
+}
+
+body{font-family:'Inter',sans-serif;background:var(--admin-bg);color:var(--admin-text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 15% 0%,rgba(241,196,15,0.08),transparent 45%),radial-gradient(ellipse at 85% 100%,rgba(255,159,28,0.06),transparent 45%);pointer-events:none;z-index:0;}
+a{color:inherit;text-decoration:none;}
+
+/* ====== TOP BAR ====== */
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar-height);background:rgba(19,26,43,0.86);backdrop-filter:blur(20px);border-bottom:1px solid var(--admin-border);z-index:998;display:flex;align-items:center;gap:16px;padding:0 24px;}
+.brand{display:flex;align-items:center;gap:12px;min-width:0;}
+.brand-logo{width:38px;height:38px;border-radius:11px;object-fit:cover;flex-shrink:0;}
+.brand-titles{line-height:1.15;min-width:0;}
+.brand-name{font-size:0.95rem;font-weight:700;white-space:nowrap;}
+.brand-sub{font-size:0.62rem;color:var(--admin-sub);text-transform:uppercase;letter-spacing:1.5px;}
+.admin-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--admin-gold),var(--admin-amber));color:#0a0e1a;font-size:0.68rem;font-weight:800;letter-spacing:1.5px;padding:5px 12px;border-radius:20px;box-shadow:0 0 18px rgba(241,196,15,0.35);flex-shrink:0;}
+.topbar-title{font-size:1rem;font-weight:600;flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.topbar-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.btn-ghost{background:rgba(255,255,255,0.05);border:1px solid var(--admin-border);color:var(--admin-text);font-family:inherit;font-size:0.78rem;font-weight:600;padding:8px 14px;border-radius:var(--radius-sm);cursor:pointer;transition:all .2s;}
+.btn-ghost:hover{background:rgba(241,196,15,0.1);border-color:rgba(241,196,15,0.4);}
+.btn-ghost.danger:hover{border-color:var(--admin-danger);background:rgba(255,71,87,0.1);}
+
+/* ====== NAV RAIL ====== */
+.rail{position:fixed;top:64px;left:0;bottom:0;width:220px;background:rgba(15,21,38,0.9);border-right:1px solid var(--admin-border);padding:18px 12px;overflow-y:auto;z-index:997;}
+.rail-group{font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:var(--admin-sub);padding:14px 10px 6px;}
+.rail-link{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);color:var(--admin-sub);font-size:0.83rem;font-weight:500;margin-bottom:2px;transition:all .2s;border-left:3px solid transparent;}
+.rail-link:hover{background:rgba(255,255,255,0.05);color:var(--admin-text);}
+.rail-link.active{background:linear-gradient(90deg,rgba(241,196,15,0.12),transparent);color:var(--admin-gold);border-left-color:var(--admin-gold);font-weight:600;}
+.rail-ico{font-size:1rem;width:20px;flex-shrink:0;text-align:center;}
+
+/* ====== LAYOUT ====== */
+.main{margin:84px 20px 30px 252px;position:relative;z-index:1;max-width:1280px;}
+.page-head{margin-bottom:22px;}
+.page-head h1{font-size:1.35rem;font-weight:800;}
+.page-head p{font-size:0.82rem;color:var(--admin-sub);margin-top:4px;}
+.gold-rule{height:3px;width:64px;background:linear-gradient(90deg,var(--admin-gold),var(--admin-amber));border-radius:3px;margin-top:10px;}
+
+/* ====== STAT CARDS ====== */
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px;}
+.stat-card{background:var(--admin-card);border:1px solid var(--admin-border);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden;transition:all .25s;}
+.stat-card:hover{transform:translateY(-3px);border-color:rgba(241,196,15,0.35);box-shadow:0 10px 30px rgba(0,0,0,0.35);}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--admin-gold),var(--admin-amber));}
+.stat-icon{font-size:1.4rem;margin-bottom:8px;}
+.stat-val{font-size:1.8rem;font-weight:800;line-height:1;margin-bottom:5px;font-variant-numeric:tabular-nums;}
+.stat-label{font-size:0.68rem;color:var(--admin-sub);text-transform:uppercase;letter-spacing:1px;}
+.stat-sub{font-size:0.7rem;color:var(--admin-amber);margin-top:5px;}
+
+/* ====== PANELS ====== */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px;}
+.panel{background:var(--admin-card);border:1px solid var(--admin-border);border-radius:var(--radius);padding:20px;}
+.panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.panel-title{font-size:0.9rem;font-weight:700;}
+.panel-sub{font-size:0.7rem;color:var(--admin-sub);margin-top:2px;}
+
+.mgmt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.mgmt-tile{background:var(--admin-card2);border:1px solid var(--admin-border);border-radius:var(--radius-sm);padding:16px;transition:all .2s;display:flex;flex-direction:column;gap:6px;cursor:pointer;}
+.mgmt-tile:hover{border-color:rgba(241,196,15,0.4);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3);}
+.mgmt-ico{font-size:1.5rem;}
+.mgmt-name{font-size:0.86rem;font-weight:700;}
+.mgmt-desc{font-size:0.7rem;color:var(--admin-sub);line-height:1.4;}
+
+.act-list{max-height:320px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--admin-border) transparent;}
+.act-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--admin-border);}
+.act-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--admin-gold);}
+.act-dot.alert{background:var(--admin-danger);}
+.act-dot.collection{background:var(--admin-ok);}
+.act-body{min-width:0;}
+.act-text{font-size:0.8rem;line-height:1.45;}
+.act-time{font-size:0.66rem;color:var(--admin-sub);margin-top:2px;}
+.empty{text-align:center;color:var(--admin-sub);font-size:0.82rem;padding:26px 0;}
+
+.kv{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--admin-border);font-size:0.82rem;}
+.kv:last-child{border-bottom:none;}
+.kv .k{color:var(--admin-sub);}
+.kv .v{font-weight:600;font-variant-numeric:tabular-nums;text-align:right;}
+.badge-ok{color:var(--admin-ok);}
+.badge-none{color:var(--admin-sub);}
+
+.backups-list{max-height:150px;overflow-y:auto;scrollbar-width:thin;}
+.backup-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--admin-border);font-size:0.76rem;}
+.backup-item:last-child{border-bottom:none;}
+.backup-fname{color:var(--admin-sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;}
+.demo-models{display:grid;gap:8px;}
+.model-chip{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--admin-card2);border:1px solid var(--admin-border);border-radius:var(--radius-sm);padding:10px 14px;font-size:0.78rem;}
+
+/* ====== TOAST (shared toast.js, admin console theme) ====== */
+.toast-container{position:fixed;top:calc(var(--topbar-height) + 12px);right:16px;z-index:12000;display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none;}
+.toast{pointer-events:auto;display:flex;align-items:flex-start;gap:10px;width:fit-content;max-width:360px;padding:12px 14px;border-radius:10px;font-size:0.84rem;font-weight:600;line-height:1.45;color:var(--admin-text);background:var(--admin-card);border:1px solid var(--admin-border);backdrop-filter:blur(20px);box-shadow:0 10px 30px rgba(0,0,0,0.45);cursor:pointer;animation:toastIn .35s cubic-bezier(.17,.67,.83,.67);}
+.toast:hover{transform:translateX(-4px);}
+.toast.toast-leave{animation:toastOut .3s ease forwards;}
+.toast-msg{flex:1;min-width:0;overflow-wrap:break-word;word-wrap:break-word;}
+.toast-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.toast-action{border:none;border-radius:8px;padding:7px 14px;font-family:inherit;font-size:0.76rem;font-weight:800;white-space:nowrap;cursor:pointer;transition:filter .2s;}
+.toast-action:hover{filter:brightness(1.12);}
+.toast-btn-primary{background:linear-gradient(135deg,var(--admin-gold),var(--admin-amber));color:#0a0e1a;}
+.toast-btn-ghost{background:transparent;border:1px solid var(--admin-border);color:var(--admin-sub);}
+.toast-close{flex-shrink:0;background:none;border:none;color:var(--admin-sub);font-size:1rem;line-height:1;padding:2px;cursor:pointer;transition:color .2s;}
+.toast-close:hover{color:var(--admin-danger);}
+.toast-success{border-color:rgba(46,204,113,0.4);}
+.toast-success .toast-msg{color:var(--admin-ok);}
+.toast-error{border-color:rgba(255,71,87,0.4);}
+.toast-error .toast-msg{color:var(--admin-danger);}
+.toast-info{border-color:rgba(241,196,15,0.4);}
+.toast-info .toast-msg{color:var(--admin-gold);}
+.toast-warning{border-color:rgba(255,159,28,0.4);}
+.toast-warning .toast-msg{color:var(--admin-amber);}
+@keyframes toastIn{from{opacity:0;transform:translateX(100%)}to{opacity:1;transform:translateX(0)}}
+@keyframes toastOut{to{opacity:0;transform:translateX(100%)}}
+@media(max-width:640px){.toast-container{left:12px;right:12px;align-items:stretch;}.toast{width:auto;max-width:none;}}
+
+@media(max-width:1100px){.stats-grid{grid-template-columns:repeat(3,1fr);}.mgmt-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:860px){
+  .rail{display:none;}
+  .main{margin-left:16px;margin-right:16px;}
+  .grid-2{grid-template-columns:1fr;}
+  .topbar-title{display:none;}
+}
+@media(max-width:560px){.stats-grid{grid-template-columns:1fr 1fr;}.mgmt-grid{grid-template-columns:1fr;}.brand-name{display:none;}}
+</style>
+<script src="/frontend/shared/js/toast.js"></script>
+<script type="module" src="/frontend/shared/js/pwa.js"></script>
+</head>
+<body class="admin-console">
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="brand">
+    <img class="brand-logo" src="/frontend/assets/images/logo-dark.png" alt="Smart Waste Segregator">
+    <div class="brand-titles">
+      <div class="brand-name">Smart Waste Segregator</div>
+      <div class="brand-sub">Admin Console</div>
+    </div>
+  </div>
+  <span class="admin-badge">🛡️ ADMIN</span>
+  <span class="topbar-title">System Management Overview</span>
+  <div class="topbar-right">
+    <a class="btn-ghost" href="/dashboard.html" title="Go to the standard user dashboard">👤 User Dashboard</a>
+    <button class="btn-ghost danger" id="adminLogout" type="button">Logout</button>
+  </div>
+</header>
+
+<!-- NAV RAIL (management-first) -->
+<nav class="rail">
+  <div class="rail-group">Management</div>
+  <a class="rail-link active" href="/admin.html"><span class="rail-ico">🛡️</span> Admin Portal</a>
+  <a class="rail-link" href="/pages/users.html"><span class="rail-ico">👥</span> Users</a>
+  <a class="rail-link" href="/pages/locations.html"><span class="rail-ico">📍</span> Locations</a>
+  <a class="rail-link" href="/pages/maintenance.html"><span class="rail-ico">🔧</span> Maintenance</a>
+  <a class="rail-link" href="/pages/reports.html"><span class="rail-ico">📊</span> Reports</a>
+  <div class="rail-group">System</div>
+  <a class="rail-link" href="/pages/users.html"><span class="rail-ico">⚙️</span> Role Controls</a>
+  <a class="rail-link" href="#system"><span class="rail-ico">💾</span> Backups &amp; ML</a>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+  <div class="page-head">
+    <h1>Administration Console</h1>
+    <p>System-wide management: accounts, locations, maintenance, and infrastructure. This portal is only available to <b style="color:var(--admin-gold)">admin</b> accounts.</p>
+    <div class="gold-rule"></div>
+  </div>
+
+  <!-- STAT CARDS -->
+  <section class="stats-grid">
+    <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-val" id="stUsers">--</div><div class="stat-label">Registered Users</div></div>
+    <div class="stat-card"><div class="stat-icon">📈</div><div class="stat-val" id="stReadings">--</div><div class="stat-label">Sensor Readings</div></div>
+    <div class="stat-card"><div class="stat-icon">🕓</div><div class="stat-val" id="stActivity">--</div><div class="stat-label">Activity Events</div></div>
+    <div class="stat-card"><div class="stat-icon">⚠️</div><div class="stat-val" id="stAnomalies">--</div><div class="stat-label">Anomalies</div></div>
+    <div class="stat-card"><div class="stat-icon">🗄️</div><div class="stat-val" id="stDb">--</div><div class="stat-label">Database Size</div><div class="stat-sub" id="stFirstRead"></div></div>
+  </section>
+
+  <!-- MANAGEMENT TILES -->
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <div class="panel-title">Management Tools</div>
+        <div class="panel-sub">Direct links to the admin pages (all gated server-side)</div>
+      </div>
+    </div>
+    <div class="mgmt-grid">
+      <a class="mgmt-tile" href="/pages/users.html">
+        <span class="mgmt-ico">👥</span><span class="mgmt-name">User Management</span>
+        <span class="mgmt-desc">List accounts, change roles (user / cleaner / supervisor / admin), remove accounts.</span>
+      </a>
+      <a class="mgmt-tile" href="/pages/locations.html">
+        <span class="mgmt-ico">📍</span><span class="mgmt-name">Bin Locations</span>
+        <span class="mgmt-desc">Add and edit collection points with bin counts and coordinates.</span>
+      </a>
+      <a class="mgmt-tile" href="/pages/maintenance.html">
+        <span class="mgmt-ico">🔧</span><span class="mgmt-name">Maintenance Log</span>
+        <span class="mgmt-desc">Track open and resolved bin issue tickets across the network.</span>
+      </a>
+      <a class="mgmt-tile" href="/pages/reports.html">
+        <span class="mgmt-ico">📊</span><span class="mgmt-name">Reports</span>
+        <span class="mgmt-desc">Fleet-wide collection and fill-rate reporting.</span>
+      </a>
+      <button class="mgmt-tile" id="btnBackup" type="button" style="text-align:left">
+        <span class="mgmt-ico">💾</span><span class="mgmt-name">Backup Database</span>
+        <span class="mgmt-desc">Snapshot the SQLite database into backend/backups right now.</span>
+      </button>
+      <button class="mgmt-tile" id="btnExport" type="button" style="text-align:left">
+        <span class="mgmt-ico">📤</span><span class="mgmt-name">Export Data</span>
+        <span class="mgmt-desc">Download stats, readings, and activity as a JSON snapshot.</span>
+      </button>
+      <button class="mgmt-tile" id="btnClearTest" type="button" style="text-align:left">
+        <span class="mgmt-ico">🧹</span><span class="mgmt-name">Clear Test Data</span>
+        <span class="mgmt-desc">Delete readings/collections/anomalies labelled TEST. A backup is created automatically first.</span>
+      </button>
+    </div>
+  </section>
+
+  <div class="grid-2">
+    <!-- RECENT ACTIVITY -->
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Recent System Activity</div>
+          <div class="panel-sub">Latest system-wide events</div>
+        </div>
+      </div>
+      <div class="act-list" id="activityList"><div class="empty">Loading events…</div></div>
+    </section>
+
+    <!-- SYSTEM / BACKUPS / ML -->
+    <section class="panel" id="system">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Backups &amp; ML Models</div>
+          <div class="panel-sub">Database snapshots and training status</div>
+        </div>
+      </div>
+      <div class="toolbar" style="margin-bottom:12px">
+        <button class="btn-ghost" id="btnBackup2" type="button">💾 Create backup</button>
+        <button class="btn-ghost" id="btnExport2" type="button">📤 Export JSON</button>
+        <a class="btn-ghost" href="/api/admin/backups" target="_blank" rel="noopener">📃 List backups</a>
+      </div>
+      <div class="kv"><span class="k">First sensor reading</span><span class="v" id="firstRead">--</span></div>
+      <div class="panel-title" style="margin:14px 0 6px">Model training status</div>
+      <div class="demo-models" id="mlStatus"><div class="empty">Loading model status…</div></div>
+      <div class="panel-title" style="margin:14px 0 6px">Recent backups</div>
+      <div class="backups-list" id="backupsList"><div class="empty">None yet.</div></div>
+    </section>
+  </div>
+</main>
+
+<script>
+(function(){
+  var esc = function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
+  var $ = function(id){return document.getElementById(id);};
+  function toast(m,t){ window.toastNotify(String(m), t || (m.indexOf('\u274c') > -1 ? 'error' : 'success')); }
+
+  function guard(r){ if(r.status===403){ window.location.href='/dashboard.html'; return null; } return r; }
+
+  // ---- Auth / admin verification (defensive: server already gates /admin.html)
+  fetch('/api/auth/me',{credentials:'include'})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(!d.authenticated){ window.location.href='/'; return; }
+      if(d.user && d.user.role==='admin'){
+        $('adminName') && ($('adminName').textContent=d.user.username);
+      } else {
+        window.location.href='/dashboard.html';
+      }
+    })
+    .catch(function(){});
+
+  // ---- Stats
+  fetch('/api/admin/stats',{credentials:'include'})
+    .then(guard)
+    .then(function(r){return r.json();})
+    .then(function(s){
+      $('stUsers').textContent=s.totalUsers;
+      $('stReadings').textContent=s.totalReadings;
+      $('stActivity').textContent=s.totalActivity;
+      $('stAnomalies').textContent=s.totalAnomalies;
+      $('stDb').textContent=(s.dbSizeMB||0)+' MB';
+      $('firstRead').textContent=s.firstReading || 'n/a';
+      $('stFirstRead').textContent='first reading: '+(s.firstReading||'n/a');
+    })
+    .catch(function(){});
+
+  // ---- Backups + ML status
+  function loadBackups(){
+    fetch('/api/admin/backups',{credentials:'include'})
+      .then(guard)
+      .then(function(r){return r.json();})
+      .then(function(list){
+        var el=$('backupsList');
+        if(!list || !list.length){ el.innerHTML='<div class="empty">None yet.</div>'; return; }
+        el.innerHTML=list.slice(0,6).map(function(b){
+          return '<div class="backup-item"><span class="backup-fname">'+esc(b.name)+'</span><span>'+b.size+' B</span></div>';
+        }).join('');
+      })
+      .catch(function(){});
+  }
+  function loadMl(){
+    fetch('/api/admin/ml/status',{credentials:'include'})
+      .then(guard)
+      .then(function(r){return r.json();})
+      .then(function(d){
+        var el=$('mlStatus');
+        if(!d || !d.models){ el.innerHTML='<div class="empty">No model artifacts yet.</div>'; return; }
+        el.innerHTML=Object.keys(d.models).map(function(bt){
+          var m=d.models[bt], fill=m.fill, an=m.anomaly;
+          var chip=function(label,obj){
+            if(!obj) return '<div class="model-chip"><span>'+label+'</span><span class="badge-none">not trained</span></div>';
+            return '<div class="model-chip"><span>'+label+'</span><span>'+(obj.kind||'model')+' · '+(obj.n_samples||obj.n_cycles||'?')+' samples</span></div>';
+          };
+          return '<div style="margin-bottom:6px"><div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--admin-sub);margin-bottom:5px">'+esc(bt)+'</div>'+chip('Fill/TTF',fill)+chip('Anomaly',an)+'</div>';
+        }).join('');
+      })
+      .catch(function(){});
+  }
+  loadBackups(); loadMl();
+
+  function doBackup(){
+    fetch('/api/admin/backup',{method:'POST',credentials:'include'})
+      .then(guard)
+      .then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j};});})
+      .then(function(res){
+        if(res.ok){ toast('✅ Backup created'); loadBackups(); }
+        else toast('❌ '+(res.j.error||'Backup failed'));
+      })
+      .catch(function(){ toast('❌ Backup failed'); });
+  }
+  $('btnBackup').addEventListener('click',doBackup);
+  $('btnBackup2').addEventListener('click',doBackup);
+
+  function doExport(){
+    fetch('/api/admin/export?format=json',{credentials:'include'})
+      .then(guard)
+      .then(function(r){return r.blob();})
+      .then(function(b){
+        var a=document.createElement('a');
+        a.href=URL.createObjectURL(b);
+        a.download='swexport-'+new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')+'.json';
+        document.body.appendChild(a); a.click();
+        setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},2000);
+        toast('✅ Export downloaded');
+      })
+      .catch(function(){ toast('❌ Export failed'); });
+  }
+  $('btnExport').addEventListener('click',doExport);
+  $('btnExport2').addEventListener('click',doExport);
+
+  function doClearTest(){
+    var msg='Delete all TEST-labelled readings, collections and anomalies?\n\nA full database backup will be created first so this is reversible.\n\nThis only affects simulated/test data — real device data is kept.';
+    if(!confirm(msg)) return;
+    fetch('/api/admin/clear-test-data',{method:'POST',credentials:'include'})
+      .then(guard)
+      .then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j};});})
+      .then(function(res){
+        if(res.ok){
+          var d=res.j.deleted||{};
+          toast('✅ Test data cleared (readings '+d.readings+', collections '+d.collections+', anomalies '+d.anomalies+', activity '+d.activity+')');
+          loadBackups();
+        }
+        else toast('❌ '+(res.j.error||'Clear test data failed'));
+      })
+      .catch(function(){ toast('❌ Clear test data failed'); });
+  }
+  $('btnClearTest').addEventListener('click',doClearTest);
+
+  // ---- Activity feed
+  fetch('/api/activity?limit=12',{credentials:'include'})
+    .then(guard)
+    .then(function(r){return r.json();})
+    .then(function(rows){
+      var el=$('activityList');
+      if(!rows || !rows.length){ el.innerHTML='<div class="empty">No activity recorded yet.</div>'; return; }
+      el.innerHTML=rows.map(function(a){
+        var cls=a.event_type==='alert'||a.event_type==='anomaly'?'alert':(a.event_type==='collection'?'collection':'');
+        var bg=cls==='alert'?'var(--admin-danger)':(cls==='collection'?'var(--admin-ok)':'var(--admin-gold)');
+        return '<div class="act-item"><span class="act-dot '+cls+'" style="background:'+bg+'"></span>'+
+          '<div class="act-body"><div class="act-text">'+esc(a.message||'')+'</div>'+
+          '<div class="act-time">'+esc(a.timestamp||'')+'</div></div></div>';
+      }).join('');
+    })
+    .catch(function(){});
+
+  // ---- Logout
+  $('adminLogout').addEventListener('click',function(){
+    fetch('/api/auth/logout',{method:'POST',credentials:'include'})
+      .catch(function(){})
+      .then(function(){ try{localStorage.removeItem('user');}catch(e){} window.location.href='/'; });
+  });
+})();
+</script>
+</body>
+</html>

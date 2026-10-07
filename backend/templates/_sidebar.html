@@ -1,0 +1,136 @@
+{# ---------------------------------------------------------------------------
+   Shared sidebar — rendered from the pages_registry.NAV list (single source
+   of truth). No markup for individual nav items lives in any page.
+
+   Context:
+     nav_items  list of registry dicts filtered for the current session role.
+     nav_role   current user's role (None if logged out).
+   The current page's link gets class="active" by comparing request.path
+   against '/' + page.path (see pages_registry docstring).
+   Pages whose sidebar brand differs may set `sidebar_brand` (via a Jinja
+   {% set %}...{% endset %} block) before including this partial.
+--------------------------------------------------------------------------- #}
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<nav class="sidebar" id="sidebar">
+  <button class="close-btn" id="closeSidebar">&times;</button>
+  {% if sidebar_brand is defined %}
+    {{ sidebar_brand | safe }}
+  {% else %}
+    <div style="display:flex;align-items:center;gap:12px;padding:12px;margin-bottom:25px;">
+      <img class="brand-logo brand-logo-light" src="/frontend/assets/images/logo.png" alt="Smart Waste Segregator logo" width="42" height="42">
+      <img class="brand-logo brand-logo-dark" src="/frontend/assets/images/logo-dark.png" alt="Smart Waste Segregator logo" width="42" height="42">
+      <span style="font-size:1.05rem;font-weight:600;color:var(--text-primary);">Smart Waste Segregator</span>
+    </div>
+  {% endif %}
+  <ul class="nav-links">
+    {%- set ns = namespace(last_group=None) %}
+    {%- for page in nav_items %}
+    {%- if not loop.first and page.group != ns.last_group and page.group != 'Overview' %}
+    <li class="nav-group" style="padding:16px 14px 4px;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-secondary);">{{ page.group }}</li>
+    {%- endif %}
+    {%- set ns.last_group = page.group %}
+    <li><a href="/{{ page.path }}"{% if request.path == ('/' ~ page.path) %} class="active"{% endif %}><span class="nav-dot" style="background:{{ page.icon }}"></span>{{ page.name }}</a></li>
+    {%- endfor %}
+  </ul>
+  <div class="sidebar-actions">
+    <div class="sidebar-user-card" id="sidebarUser">
+      <div class="su-avatar" id="suAvatar">…</div>
+      <span class="su-name" id="suName">Loading…</span>
+      <span class="su-divider"></span>
+      <button class="su-logout" id="suLogout" type="button" title="Logout" aria-label="Logout">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Logout</span>
+      </button>
+    </div>
+    <div class="theme-picker" id="themePicker">
+      <span class="tc-icon" aria-hidden="true">🎨</span>
+      <span class="tc-label">Theme</span>
+      <span class="tc-select-wrap">
+        <select id="themeSelect" aria-label="Choose theme" onchange="window.setTheme(this.value)">
+          <option value="dark">🌙 Dark</option>
+          <option value="light">☀️ Light</option>
+          <option value="ocean">🌊 Ocean</option>
+          <option value="nature">🌿 Nature</option>
+          <option value="sunset">🌅 Sunset</option>
+          <option value="galaxy">🌌 Galaxy</option>
+        </select>
+      </span>
+    </div>
+  </div>
+</nav>
+<button class="hamburger" id="hamburger">&#9776;</button>
+<script>
+(function(){
+  var h=document.getElementById('hamburger'),s=document.getElementById('sidebar'),
+      c=document.getElementById('closeSidebar'),o=document.getElementById('sidebarOverlay');
+  function openS(){s.classList.add('active');if(o)o.style.display='block';}
+  function closeS(){s.classList.remove('active');if(o)o.style.display='none';}
+  if(h)h.onclick=openS;if(c)c.onclick=closeS;if(o)o.onclick=closeS;
+  document.addEventListener('click',function(e){
+    if(s&&s.classList.contains('active')&&!e.target.closest('#sidebar')&&!e.target.closest('#hamburger'))closeS();
+  });
+})();
+</script>
+<script>
+(function(){
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function $id(x){return document.getElementById(x);}
+
+  function redirectToLogin(){
+    try{localStorage.removeItem('user');}catch(e){}
+    if(window.location.pathname.indexOf('index.html')===-1&&window.location.pathname!=='/'){
+      window.location.href='/';
+    }
+  }
+
+  var lastName='User';
+
+  function setSidebarAvatar(url, name){
+    var av=$id('suAvatar');
+    var initial=esc((name||'U').charAt(0).toUpperCase());
+    if(url){
+      av.innerHTML='<img class="su-avatar-img" src="'+esc(url)+'" alt="'+initial+'">';
+    }else{
+      av.textContent=initial;
+    }
+  }
+
+  function render(me){
+    var u=(me&&me.user)||{};
+    var name=(u.fullName&&u.fullName.trim())?u.fullName:u.username||'User';
+    lastName=name;
+    setSidebarAvatar(u.avatarUrl||'', name);
+    $id('suName').textContent=esc(name);
+  }
+
+  // Live avatar updates fired by the Profile page after a change (no reload).
+  window.addEventListener('avatar-updated', function(e){
+    var url=(e&&e.detail&&e.detail.avatarUrl)||'';
+    setSidebarAvatar(url, lastName);
+  });
+
+  fetch('/api/auth/me',{credentials:'include'})
+    .then(function(r){return r.json().then(function(j){return{ok:r.ok,data:j};});})
+    .then(function(res){
+      if(!res.ok||!res.data||!res.data.authenticated){redirectToLogin();return;}
+      render(res.data);
+    })
+    .catch(function(){ });
+
+  var logout=$id('suLogout');
+  if(logout){
+    logout.addEventListener('click',function(){
+      logout.disabled=true;
+      fetch('/api/auth/logout',{method:'POST',credentials:'include'})
+        .catch(function(){})
+        .then(function(){
+          try{localStorage.removeItem('user');}catch(e){}
+          window.location.href='/';
+        });
+    });
+  }
+})();
+</script>
+<script src="/frontend/shared/js/toast.js"></script>
+<script src="/frontend/shared/js/emailjs-config.js"></script>
+<script src="/frontend/shared/js/chat-widget.js"></script>

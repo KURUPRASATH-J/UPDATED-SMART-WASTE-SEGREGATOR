@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" sizes="32x32" href="/frontend/assets/images/favicon-32x32.png?v=1">
+<link rel="icon" type="image/png" sizes="16x16" href="/frontend/assets/images/favicon-16x16.png?v=1">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo.png?v=1" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo-dark.png?v=1" media="(prefers-color-scheme: dark)">
+<link rel="shortcut icon" href="/frontend/assets/images/favicon.ico?v=1">
+<link rel="apple-touch-icon" sizes="180x180" href="/frontend/assets/images/apple-touch-icon.png?v=1">
+<meta name="theme-color" content="#091020">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dry Bin - Smart Waste Segregator</title>
+<link rel="stylesheet" href="/frontend/shared/css/themes.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{min-height:100vh;background:var(--bg-primary);font-family:"Poppins",sans-serif;color:var(--text-primary);overflow-x:hidden;}
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none;}
+.sidebar{position:fixed;left:0;top:0;height:100%;width:260px;background:var(--bg-card);backdrop-filter:blur(20px);border-right:1px solid var(--border-color);padding:20px 12px;z-index:1000;transform:translateX(-100%);transition:transform 0.35s cubic-bezier(.4,0,.2,1);overflow-y:auto;}
+.sidebar.active{transform:translateX(0);}
+.close-btn{position:absolute;top:18px;right:14px;background:none;border:none;color:var(--text-secondary);font-size:1.5rem;cursor:pointer;}.close-btn:hover{color:#ff6b6b;}
+.nav-links{list-style:none;}.nav-links li{margin-bottom:1px;}
+.nav-links a{display:flex;align-items:center;gap:10px;padding:10px 14px;color:var(--text-secondary);text-decoration:none;border-radius:10px;transition:all 0.2s;font-size:0.88rem;}
+.nav-links a:hover{background:var(--bg-secondary);color:var(--text-primary);}
+.nav-links a.active{background:linear-gradient(135deg,rgba(0,212,255,0.12),rgba(0,255,136,0.06));color:var(--accent-primary);font-weight:500;border-left:3px solid var(--accent-primary);}
+.nav-dot{display:inline-block;width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.hamburger{position:fixed;top:18px;left:18px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-primary);font-size:1.3rem;padding:7px 11px;border-radius:8px;cursor:pointer;z-index:999;backdrop-filter:blur(10px);transition:background 0.2s;}.hamburger:hover{background:var(--bg-secondary);}
+.main{padding:80px 24px 30px;max-width:1000px;margin:0 auto;}
+.page-title{font-size:2rem;font-weight:700;margin-bottom:30px;color:var(--accent-primary);}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:30px;}
+.scard{background:var(--bg-card);border:1px solid var(--border-color);border-radius:14px;padding:18px;text-align:center;}
+.scard h3{font-size:0.72rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.scard .val{font-size:1.5rem;font-weight:700;color:var(--accent-primary);}
+.bin-section{display:flex;justify-content:center;margin-bottom:30px;}
+.bin-box{width:240px;height:320px;border-radius:20px;background:rgba(0,0,0,0.2);border:1px solid var(--border-color);position:relative;overflow:hidden;}
+.bin-lid{position:absolute;top:0;left:8%;width:84%;height:24px;border-radius:12px 12px 0 0;background:linear-gradient(180deg,rgba(255,255,255,0.1),rgba(0,0,0,0.2));z-index:10;}
+.bin-fill{position:absolute;bottom:0;left:0;width:100%;height:0%;transition:height 1.5s cubic-bezier(.4,0,.2,1);overflow:hidden;}
+.bin-fill-liq{position:absolute;bottom:0;left:0;width:100%;height:100%;background:linear-gradient(to top,#006633,#009955,#33cc77);}
+.bin-fill-wave{position:absolute;top:-12px;left:0;width:200%;height:25px;z-index:3;background-repeat:repeat-x;background-size:250px 25px;background-image:radial-gradient(circle at 25% 50%,rgba(255,255,255,0.15) 0%,transparent 50%),radial-gradient(circle at 75% 50%,rgba(255,255,255,0.12) 0%,transparent 50%);animation:wave 3.5s linear infinite;}
+@keyframes wave{0%{transform:translateX(0);}100%{transform:translateX(-250px);}}
+.bin-pct{position:absolute;bottom:15px;left:0;width:100%;text-align:center;font-size:2.2rem;font-weight:800;color:#fff;z-index:5;text-shadow:0 2px 12px rgba(0,0,0,0.5);}
+.bin-icon{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);font-size:2.5rem;z-index:5;}
+.card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:16px;padding:22px;margin-bottom:20px;}
+.card h2{font-size:1.1rem;font-weight:600;margin-bottom:16px;color:var(--accent-primary);}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;padding:10px 12px;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-secondary);border-bottom:1px solid var(--border-color);}
+td{padding:10px 12px;font-size:0.85rem;border-bottom:1px solid var(--border-color);}
+@media(max-width:768px){.main{padding:70px 14px 20px;}.stats{grid-template-columns:1fr 1fr;}.bin-box{width:200px;height:270px;}}
+@media(max-width:480px){.stats{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+{% include '_sidebar.html' %}
+
+<main class="main">
+  <h1 class="page-title">&#9851; Dry Waste Bin</h1>
+  <div class="stats">
+    <div class="scard"><h3>Current Level</h3><div class="val" id="dryLevel">0%</div></div>
+    <div class="scard"><h3>Status</h3><div class="val" id="dryStatus">Loading...</div></div>
+    <div class="scard"><h3>Distance</h3><div class="val" id="dryDist">-- cm</div></div>
+    <div class="scard"><h3>Last Updated</h3><div class="val" id="dryTime">--</div></div>
+  </div>
+  <div class="bin-section">
+    <div class="bin-box">
+      <div class="bin-lid"></div>
+      <div class="bin-icon">&#9851;</div>
+      <div class="bin-fill" id="dryFill"><div class="bin-fill-liq"></div><div class="bin-fill-wave"></div></div>
+      <div class="bin-pct" id="dryPct">0%</div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Recent Readings</h2>
+    <div style="max-height:250px;overflow-y:auto;">
+      <table><thead><tr><th>Time</th><th>Level</th><th>Distance</th></tr></thead>
+      <tbody id="logBody"><tr><td colspan="3" style="text-align:center;color:var(--text-secondary);">Loading...</td></tr></tbody></table>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+(function(){
+  function update(data){
+    if(!data) return;
+    var level=Math.max(0,Math.min(100,Math.round(data.level||0)));
+    document.getElementById('dryLevel').textContent=level+'%';
+    document.getElementById('dryPct').textContent=level+'%';
+    document.getElementById('dryFill').style.height=level+'%';
+    document.getElementById('dryDist').textContent=(data.distance||0).toFixed?parseFloat(data.distance).toFixed(1)+' cm':'-- cm';
+    document.getElementById('dryTime').textContent=data.updated_at?new Date(data.updated_at).toLocaleTimeString():new Date().toLocaleTimeString();
+    var s=document.getElementById('dryStatus');
+    if(level>=90){s.textContent='CRITICAL';s.style.color='var(--danger)';}
+    else if(level>=80){s.textContent='Almost Full';s.style.color='var(--danger)';}
+    else if(level>=50){s.textContent='Half Full';s.style.color='var(--warning)';}
+    else if(level>0){s.textContent='Normal';s.style.color='var(--success)';}
+    else{s.textContent='Empty';s.style.color='var(--accent-primary)';}
+  }
+  fetch('/api/bins/dryBin').then(function(r){return r.json();}).then(update).catch(function(){document.getElementById('dryStatus').textContent='Offline';document.getElementById('dryStatus').style.color='var(--danger)';});
+  fetch('/api/readings?bin=dryBin&limit=20').then(function(r){return r.json();}).then(function(list){
+    if(list.length===0){document.getElementById('logBody').innerHTML='<tr><td colspan="3" style="text-align:center;color:var(--text-secondary);">No readings yet</td></tr>';return;}
+    document.getElementById('logBody').innerHTML=list.map(function(r){return '<tr><td>'+new Date(r.timestamp).toLocaleTimeString()+'</td><td>'+r.level+'%</td><td>'+(r.distance||0).toFixed(1)+' cm</td></tr>';}).join('');
+  }).catch(function(){});
+  try{var socket=io();socket.on('bin_update',function(data){if(data.dryBin)update(data.dryBin);});}catch(e){}
+})();
+</script>
+<script type="module" src="/frontend/shared/js/theme-switcher.js"></script>
+</body>
+</html>

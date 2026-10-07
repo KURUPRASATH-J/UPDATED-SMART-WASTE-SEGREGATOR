@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | Smart Waste Segregator</title>
+        <link rel="icon" type="image/png" sizes="32x32" href="/frontend/assets/images/favicon-32x32.png?v=1">
+        <link rel="icon" type="image/png" sizes="16x16" href="/frontend/assets/images/favicon-16x16.png?v=1">
+        <link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo.png?v=1" media="(prefers-color-scheme: light)">
+        <link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo-dark.png?v=1" media="(prefers-color-scheme: dark)">
+        <link rel="shortcut icon" href="/frontend/assets/images/favicon.ico?v=1">
+        <link rel="apple-touch-icon" sizes="180x180" href="/frontend/assets/images/apple-touch-icon.png?v=1">
+        <meta name="theme-color" content="#091020">
+    <link rel="stylesheet" href="/frontend/shared/css/themes.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap');
+        /* ═══════════════════════════════════════════
+           RESET & BASE
+           ═══════════════════════════════════════════ */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* ═══════════════════════════════════════════
+           BACKGROUND — ANIMATED GRID
+           ═══════════════════════════════════════════ */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridDrift 20s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes gridDrift {
+            0%   { background-position: 0 0; }
+            100% { background-position: 60px 60px; }
+        }
+
+        /* ═══════════════════════════════════════════
+           BACKGROUND — RADIAL BLOBS
+           ═══════════════════════════════════════════ */
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.25;
+            z-index: 0;
+            animation: blobFloat 12s ease-in-out infinite alternate;
+        }
+
+        .blob-1 {
+            width: 500px; height: 500px;
+            background: #00d4ff;
+            top: -10%; left: -10%;
+            animation-duration: 14s;
+        }
+
+        .blob-2 {
+            width: 400px; height: 400px;
+            background: #00ff99;
+            bottom: -10%; right: -10%;
+            animation-duration: 18s;
+            animation-delay: -4s;
+        }
+
+        .blob-3 {
+            width: 300px; height: 300px;
+            background: #a855f7;
+            top: 50%; left: 60%;
+            animation-duration: 16s;
+            animation-delay: -8s;
+        }
+
+        @keyframes blobFloat {
+            0%   { transform: translate(0, 0) scale(1); }
+            50%  { transform: translate(40px, -30px) scale(1.15); }
+            100% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+
+        /* ═══════════════════════════════════════════
+           FLOATING PARTICLES (CSS-only)
+           ═══════════════════════════════════════════ */
+        .particles-container {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0;
+            animation: particleRise linear infinite;
+        }
+
+        @keyframes particleRise {
+            0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10%  { opacity: 1; }
+            90%  { opacity: 1; }
+            100% { transform: translateY(-110vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* ═══════════════════════════════════════════
+           FLOATING WASTE ICONS
+           ═══════════════════════════════════════════ */
+        .floating-icons {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-icon {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0;
+            animation: floatIcon linear infinite;
+            filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.3));
+        }
+
+        @keyframes floatIcon {
+            0%   { transform: translateY(100vh) rotate(0deg) scale(0.8); opacity: 0; }
+            5%   { opacity: 0.5; }
+            85%  { opacity: 0.5; }
+            100% { transform: translateY(-10vh) rotate(360deg) scale(1.1); opacity: 0; }
+        }
+
+        /* ═══════════════════════════════════════════
+           MAIN CARD
+           ═══════════════════════════════════════════ */
+        .error-container {
+            color: #e8edf7;
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 3rem 2.5rem;
+            max-width: 620px;
+            width: 92%;
+            background: rgba(11, 15, 30, 0.92);
+            border: 1px solid rgba(0, 212, 255, 0.12);
+            border-radius: 28px;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.45),
+                inset 0 0 80px rgba(0, 212, 255, 0.04),
+                0 0 120px rgba(0, 212, 255, 0.06);
+            animation: cardEntry 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            opacity: 0;
+            transform: translateY(40px) scale(0.96);
+        }
+
+        @keyframes cardEntry {
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ═══════════════════════════════════════════
+           404 HEADING
+           ═══════════════════════════════════════════ */
+        .error-code {
+            font-size: clamp(6rem, 18vw, 10rem);
+            font-weight: 900;
+            line-height: 1;
+            background: linear-gradient(135deg, #00d4ff 0%, #00ff99 40%, #a855f7 70%, #00d4ff 100%);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 4s ease-in-out infinite, textGlow 3s ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 30px rgba(0, 212, 255, 0.35));
+            margin-bottom: 0.2rem;
+            user-select: none;
+            cursor: default;
+            transition: transform 0.3s ease;
+        }
+
+        .error-code:hover {
+            transform: scale(1.06);
+        }
+
+        @keyframes gradientShift {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes textGlow {
+            0%   { filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.25)); }
+            100% { filter: drop-shadow(0 0 50px rgba(0, 255, 153, 0.4)); }
+        }
+
+        /* ═══════════════════════════════════════════
+           WASTE BIN EMOJI
+           ═══════════════════════════════════════════ */
+        .bin-emoji {
+            font-size: 4rem;
+            display: inline-block;
+            animation: binBounce 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 16px rgba(0, 255, 153, 0.3));
+            margin: 0.5rem 0;
+        }
+
+        @keyframes binBounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25%      { transform: translateY(-16px) rotate(-8deg); }
+            50%      { transform: translateY(0) rotate(0deg); }
+            75%      { transform: translateY(-10px) rotate(8deg); }
+        }
+
+        /* LID ANIMATION — separate element */
+        .bin-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .bin-lid {
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.6rem;
+            animation: lidFlap 2s ease-in-out infinite;
+            transform-origin: left center;
+        }
+
+        @keyframes lidFlap {
+            0%, 100% { transform: translateX(-50%) rotate(0deg); }
+            30%      { transform: translateX(-50%) rotate(-35deg); }
+            60%      { transform: translateX(-50%) rotate(0deg); }
+        }
+
+        /* ═══════════════════════════════════════════
+           TEXT CONTENT
+           ═══════════════════════════════════════════ */
+        .error-title {
+            font-size: clamp(1.1rem, 3vw, 1.45rem);
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0.8rem 0 0.5rem;
+            text-shadow: 0 2px 12px rgba(0, 212, 255, 0.15);
+        }
+
+        .error-subtitle {
+            font-size: clamp(0.85rem, 2.2vw, 1rem);
+            color: rgba(224, 224, 224, 0.65);
+            font-weight: 400;
+            max-width: 440px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+
+        .error-subtitle span {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+
+        /* ═══════════════════════════════════════════
+           BUTTONS
+           ═══════════════════════════════════════════ */
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.85rem 2rem;
+            border-radius: 14px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Primary — gradient */
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff, #00ff99);
+            color: #091020;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #00ff99, #00d4ff);
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.04);
+            box-shadow: 0 8px 32px rgba(0, 212, 255, 0.5);
+        }
+
+        .btn-primary:hover::before {
+            opacity: 1;
+        }
+
+        .btn-primary span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Secondary — glass */
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.15);
+        }
+
+        /* Ripple effect */
+        .btn .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(0);
+            animation: rippleAnim 0.6s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes rippleAnim {
+            to { transform: scale(4); opacity: 0; }
+        }
+
+        /* ═══════════════════════════════════════════
+           BOTTOM TAGLINE
+           ═══════════════════════════════════════════ */
+        .tagline {
+            margin-top: 2rem;
+            font-size: 0.75rem;
+            color: rgba(224, 224, 224, 0.3);
+            letter-spacing: 0.5px;
+        }
+
+        .tagline a {
+            color: rgba(0, 212, 255, 0.5);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .tagline a:hover {
+            color: #00d4ff;
+        }
+
+        /* ═══════════════════════════════════════════
+           SCANNING LINE DECORATION
+           ═══════════════════════════════════════════ */
+        .scan-line {
+            position: absolute;
+            left: 5%;
+            width: 90%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00d4ff, #00ff99, transparent);
+            border-radius: 2px;
+            opacity: 0.4;
+            animation: scanMove 4s ease-in-out infinite;
+        }
+
+        @keyframes scanMove {
+            0%, 100% { top: 10%; opacity: 0; }
+            10%      { opacity: 0.4; }
+            50%      { top: 88%; opacity: 0.4; }
+            90%      { opacity: 0; }
+        }
+
+        /* ═══════════════════════════════════════════
+           CORNER DECORATIONS
+           ═══════════════════════════════════════════ */
+        .corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-color: rgba(0, 212, 255, 0.3);
+            border-style: solid;
+            border-width: 0;
+        }
+
+        .corner-tl { top: 12px; left: 12px; border-top-width: 2px; border-left-width: 2px; border-radius: 4px 0 0 0; }
+        .corner-tr { top: 12px; right: 12px; border-top-width: 2px; border-right-width: 2px; border-radius: 0 4px 0 0; }
+        .corner-bl { bottom: 12px; left: 12px; border-bottom-width: 2px; border-left-width: 2px; border-radius: 0 0 0 4px; }
+        .corner-br { bottom: 12px; right: 12px; border-bottom-width: 2px; border-right-width: 2px; border-radius: 0 0 4px 0; }
+
+        /* ═══════════════════════════════════════════
+           RESPONSIVE
+           ═══════════════════════════════════════════ */
+        @media (max-width: 480px) {
+            .error-container {
+                padding: 2rem 1.5rem;
+                border-radius: 20px;
+            }
+
+            .bin-emoji {
+                font-size: 3rem;
+            }
+
+            .btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.88rem;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .btn-group {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+        }
+    
+/* Sidebar */
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none;}
+.sidebar{position:fixed;left:0;top:0;height:100%;width:260px;background:var(--bg-card);backdrop-filter:blur(20px);border-right:1px solid var(--border-color);padding:20px 12px;z-index:1000;transform:translateX(-100%);transition:transform 0.35s cubic-bezier(.4,0,.2,1);overflow-y:auto;}
+.sidebar.active{transform:translateX(0);}
+.close-btn{position:absolute;top:18px;right:14px;background:none;border:none;color:var(--text-secondary);font-size:1.5rem;cursor:pointer;transition:color 0.2s;}
+.close-btn:hover{color:#ff6b6b;}
+.nav-links{list-style:none;}
+.nav-links li{margin-bottom:1px;}
+.nav-links a{display:flex;align-items:center;gap:10px;padding:10px 14px;color:var(--text-secondary);text-decoration:none;border-radius:10px;transition:all 0.2s;font-size:0.88rem;}
+.nav-links a:hover{background:var(--bg-secondary);color:var(--text-primary);}
+.nav-links a.active{background:linear-gradient(135deg,rgba(0,212,255,0.12),rgba(0,255,136,0.06));color:var(--accent-primary);font-weight:500;border-left:3px solid var(--accent-primary);}
+.nav-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:8px;flex-shrink:0;}
+.hamburger{position:fixed;top:18px;left:18px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-primary);font-size:1.3rem;padding:7px 11px;border-radius:8px;cursor:pointer;z-index:999;backdrop-filter:blur(10px);transition:background 0.2s;}
+.hamburger:hover{background:var(--bg-secondary);}
+</style>
+</head>
+<body>
+{% include '_sidebar.html' %}
+<!-- ════════ BACKGROUND LAYERS ════════ -->
+    <div class="bg-grid"></div>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <!-- ════════ FLOATING PARTICLES ════════ -->
+    <div class="particles-container" id="particles"></div>
+
+    <!-- ════════ FLOATING WASTE ICONS ════════ -->
+    <div class="floating-icons" id="floatingIcons"></div>
+
+    <!-- ════════ MAIN ERROR CARD ════════ -->
+    <div class="error-container" id="errorCard">
+        <!-- Corner brackets -->
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+
+        <!-- Scan line -->
+        <div class="scan-line"></div>
+
+        <!-- 404 Code -->
+        <div class="error-code" id="errorCode">404</div>
+
+        <!-- Animated Bin -->
+        <div class="bin-emoji" aria-hidden="true">🗑️</div>
+
+        <!-- Messages -->
+        <h1 class="error-title">Oops! This page got thrown in the wrong bin!</h1>
+        <p class="error-subtitle">
+            Looks like the page you're looking for has been <span>recycled</span>,
+            <span>composted</span>, or never existed in the first place.
+        </p>
+
+        <!-- Buttons -->
+        <div class="btn-group">
+            <a href="/dashboard.html" class="btn btn-primary" id="btnDashboard">
+                <span>📊 Go to Dashboard</span>
+            </a>
+            <button class="btn btn-secondary" id="btnGoBack" onclick="history.back()">
+                ← Go Back
+            </button>
+        </div>
+
+        <!-- Tagline -->
+        <p class="tagline">
+            Smart Waste Segregator &bull; <a href="/dashboard.html">Return to safety</a>
+        </p>
+    </div>
+
+    <!-- ════════════════════════════════════════════════
+         JAVASCRIPT — Particles, Icons & Interactions
+         ════════════════════════════════════════════════ -->
+    <script>
+        /* ─── Floating Particles ─── */
+        (function createParticles() {
+            const container = document.getElementById('particles');
+            const colors = ['#00d4ff', '#00ff99', '#a855f7', '#ff6b6b', '#fbbf24'];
+            const count = 40;
+
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                const size = Math.random() * 5 + 2;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const left = Math.random() * 100;
+                const dur = Math.random() * 12 + 8;
+                const delay = Math.random() * 15;
+
+                Object.assign(p.style, {
+                    width: size + 'px',
+                    height: size + 'px',
+                    background: color,
+                    left: left + '%',
+                    bottom: '-5%',
+                    boxShadow: `0 0 ${size * 2}px ${color}`,
+                    animationDuration: dur + 's',
+                    animationDelay: delay + 's'
+                });
+
+                container.appendChild(p);
+            }
+        })();
+
+        /* ─── Floating Waste Emoji Icons ─── */
+        (function createFloatingIcons() {
+            const container = document.getElementById('floatingIcons');
+            const icons = ['🗑️', '♻️', '🌿', '🍃', '🌍', '💧', '🔋', '📦', '🥤', '🍌', '📰', '🧴'];
+            const count = 14;
+
+            for (let i = 0; i < count; i++) {
+                const el = document.createElement('span');
+                el.classList.add('floating-icon');
+                el.textContent = icons[Math.floor(Math.random() * icons.length)];
+                const left = Math.random() * 96 + 2;
+                const dur = Math.random() * 18 + 14;
+                const delay = Math.random() * 20;
+                const size = Math.random() * 1.2 + 1.2;
+
+                Object.assign(el.style, {
+                    left: left + '%',
+                    fontSize: size + 'rem',
+                    animationDuration: dur + 's',
+                    animationDelay: delay + 's'
+                });
+
+                container.appendChild(el);
+            }
+        })();
+
+        /* ─── Button Ripple Effect ─── */
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                const rect = this.getBoundingClientRect();
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple');
+                const size = Math.max(rect.width, rect.height);
+                Object.assign(ripple.style, {
+                    width: size + 'px',
+                    height: size + 'px',
+                    left: (e.clientX - rect.left - size / 2) + 'px',
+                    top: (e.clientY - rect.top - size / 2) + 'px'
+                });
+                this.appendChild(ripple);
+                ripple.addEventListener('animationend', () => ripple.remove());
+            });
+        });
+
+        /* ─── 404 Scramble Effect on Hover ─── */
+        const errorCode = document.getElementById('errorCode');
+        const originalText = '404';
+        const glitchChars = '!@#$%^&*0123456789?';
+        let scrambleInterval = null;
+
+        errorCode.addEventListener('mouseenter', () => {
+            let iteration = 0;
+            clearInterval(scrambleInterval);
+            scrambleInterval = setInterval(() => {
+                errorCode.textContent = originalText
+                    .split('')
+                    .map((char, idx) => {
+                        if (idx < iteration) return originalText[idx];
+                        return glitchChars[Math.floor(Math.random() * glitchChars.length)];
+                    })
+                    .join('');
+                iteration += 1 / 2;
+                if (iteration >= originalText.length) {
+                    clearInterval(scrambleInterval);
+                    errorCode.textContent = originalText;
+                }
+            }, 50);
+        });
+
+        /* ─── Parallax tilt on mouse move ─── */
+        const card = document.getElementById('errorCard');
+
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 2;   // -1 → 1
+            const y = (e.clientY / window.innerHeight - 0.5) * 2;
+            const tiltX = y * -3;   // degrees
+            const tiltY = x * 3;
+
+            card.style.transform = `perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+        });
+
+        document.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg)';
+        });
+
+        /* ─── Keyboard: Escape goes back ─── */
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') history.back();
+        });
+    </script>
+<script type="module" src="/frontend/shared/js/theme-switcher.js"></script>
+</body>
+</html>

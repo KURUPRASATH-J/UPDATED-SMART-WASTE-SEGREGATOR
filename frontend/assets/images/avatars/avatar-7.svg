@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Avatar illustration">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#475569"/><stop offset="1" stop-color="#94a3b8"/></linearGradient></defs><circle cx="60" cy="60" r="58" fill="url(#g)"/><circle cx="60" cy="60" r="58" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="3"/>
+  <circle cx="60" cy="57" r="26" fill="#cbd5e1"/><circle cx="35" cy="58" r="4.5" fill="#cbd5e1"/><circle cx="85" cy="58" r="4.5" fill="#cbd5e1"/>
+  <circle cx="60" cy="57" r="27" fill="#94a3b8"/><path d="M34 66 L34 54 Q60 42 86 54 L86 66 Q60 80 34 66 Z" fill="#64748b"/>
+  <circle cx="51" cy="56" r="3.6" fill="#1e293b"/><circle cx="69" cy="56" r="3.6" fill="#1e293b"/><circle cx="52.2" cy="54.8" r="1.1" fill="#fff"/><circle cx="70.2" cy="54.8" r="1.1" fill="#fff"/>
+  <path d="M52 66 Q60 72 68 66" fill="none" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/>
+  <rect x="57" y="22" width="6" height="9" rx="2" fill="#94a3b8"/><circle cx="60" cy="21" r="4" fill="#f87171"/><rect x="55" y="28" width="10" height="5" rx="2" fill="#e2e8f0"/><rect x="45" y="52" width="9" height="6" rx="2" fill="#0f172a"/><rect x="66" y="52" width="9" height="6" rx="2" fill="#0f172a"/><path d="M50 68 Q60 72 70 68" fill="none" stroke="#0f172a" stroke-width="2.6" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Map View - Smart Waste Segregator</title>
+<link rel="stylesheet" href="/frontend/shared/css/themes.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at top, #091020, #020617);
+  color: white;
+  min-height: 100vh;
+  padding: 100px 20px 40px 20px;
+}
+
+.map-container {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+}
+
+#map {
+  width: 100%;
+  height: calc(100vh - 220px);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.map-controls {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-btn {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+  background: rgba(0, 212, 255, 0.2);
+  border-color: #00d4ff;
+}
+
+.legend {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 15px;
+  border-radius: 10px;
+  z-index: 1000;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.legend h4 {
+  color: #111;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+  color: #111;
+  font-size: 0.85rem;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.popup-content {
+  color: #111;
+}
+
+.popup-content h3 {
+  margin-bottom: 10px;
+  color: #00d4ff;
+}
+
+.popup-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.popup-stat {
+  background: #f5f5f5;
+  padding: 8px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.popup-stat .value {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #00d4ff;
+}
+
+.popup-stat .label {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.view-details-btn {
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(135deg, #00d4ff, #00ff99);
+  border: none;
+  border-radius: 8px;
+  color: #111;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 80px 20px 40px 20px;
+  }
+  
+  #map {
+    height: calc(100vh - 180px);
+  }
+  
+  .legend {
+    bottom: 10px;
+    right: 10px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Sidebar */
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none;}
+.sidebar{position:fixed;left:0;top:0;height:100%;width:260px;background:rgba(12,16,30,0.97);backdrop-filter:blur(20px);border-right:1px solid rgba(255,255,255,0.06);padding:20px 12px;z-index:1000;transform:translateX(-100%);transition:transform 0.35s cubic-bezier(.4,0,.2,1);overflow-y:auto;}
+.sidebar.active{transform:translateX(0);}
+.close-btn{position:absolute;top:18px;right:14px;background:none;border:none;color:rgba(255,255,255,0.4);font-size:1.5rem;cursor:pointer;transition:color 0.2s;}
+.close-btn:hover{color:#ff6b6b;}
+.nav-links{list-style:none;}
+.nav-links li{margin-bottom:1px;}
+.nav-links a{display:flex;align-items:center;gap:10px;padding:10px 14px;color:rgba(255,255,255,0.6);text-decoration:none;border-radius:10px;transition:all 0.2s;font-size:0.88rem;}
+.nav-links a:hover{background:rgba(255,255,255,0.05);color:#fff;}
+.nav-links a.active{background:linear-gradient(135deg,rgba(0,212,255,0.12),rgba(0,255,136,0.06));color:#00d4ff;font-weight:500;border-left:3px solid #00d4ff;}
+.nav-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:8px;flex-shrink:0;}
+.hamburger{position:fixed;top:18px;left:18px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.08);color:#fff;font-size:1.3rem;padding:7px 11px;border-radius:8px;cursor:pointer;z-index:999;backdrop-filter:blur(10px);transition:background 0.2s;}
+.hamburger:hover{background:rgba(255,255,255,0.12);}
+</style>
+</head>
+<body>
+{% include '_sidebar.html' %}
+<div class="map-container">
+  <h1>🗺️ Bin Locations Map</h1>
+  
+  <div class="map-controls">
+    <span style="font-weight: 600;">Filter:</span>
+    <button class="filter-btn active" onclick="filterMap('all')">All Bins</button>
+    <button class="filter-btn" onclick="filterMap('full')">🔴 Full (>80%)</button>
+    <button class="filter-btn" onclick="filterMap('warning')">🟡 Warning (60-80%)</button>
+    <button class="filter-btn" onclick="filterMap('ok')">🟢 OK (<60%)</button>
+  </div>
+  
+  <div id="map"></div>
+  
+  <div class="legend">
+    <h4>Status Legend</h4>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #00ff99;"></div>
+      <span>OK (< 60%)</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #ffaa00;"></div>
+      <span>Warning (60-80%)</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #ff4444;"></div>
+      <span>Full (> 80%)</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// Bin location markers (geography). Fill levels are synced from the live
+// /api/bins feed every 30 seconds.
+var binLocations = [
+  { id: 1, name: 'Building A - Floor 3', lat: 28.6139, lng: 77.2090 },
+  { id: 2, name: 'Building B - Ground Floor', lat: 28.6149, lng: 77.2100 },
+  { id: 3, name: 'Cafeteria', lat: 28.6129, lng: 77.2080 },
+  { id: 4, name: 'Parking Area', lat: 28.6119, lng: 77.2070 },
+  { id: 5, name: 'Garden Area', lat: 28.6159, lng: 77.2110 }
+];
+
+// Initialize map (centered on New Delhi by default)
+var map = L.map('map').setView([28.6139, 77.2090], 14);
+
+// Add OpenStreetMap tile layer
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors',
+  maxZoom: 19
+}).addTo(map);
+
+var binLayer = L.layerGroup().addTo(map);
+var liveWet = 0;
+var liveDry = 0;
+
+function markerFor(bin) {
+  var avg = (liveWet + liveDry) / 2;
+  var color = avg >= 80 ? '#ff4444' : avg >= 60 ? '#ffaa00' : '#00ff99';
+
+  var icon = L.divIcon({
+    className: 'custom-marker',
+    html: '<div style="' +
+      'width: 40px; height: 40px; background: ' + color + ';' +
+      'border-radius: 50%; border: 3px solid white;' +
+      'box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);' +
+      'display: flex; align-items: center; justify-content: center;' +
+      'font-size: 1.2rem;">🗑️</div>',
+    iconSize: [40, 40],
+    iconAnchor: [20, 20]
+  });
+
+  var marker = L.marker([bin.lat, bin.lng], { icon: icon }).addTo(binLayer);
+
+  var popupContent =
+    '<div class="popup-content">' +
+      '<h3>' + bin.name + '</h3>' +
+      '<div class="popup-stats">' +
+        '<div class="popup-stat">' +
+          '<div class="value">' + liveWet + '%</div>' +
+          '<div class="label">💧 Wet</div>' +
+        '</div>' +
+        '<div class="popup-stat">' +
+          '<div class="value">' + liveDry + '%</div>' +
+          '<div class="label">♻️ Dry</div>' +
+        '</div>' +
+      '</div>' +
+      '<button class="view-details-btn" onclick="window.location.href=\'/frontend/dashboard.html\'">View Details</button>' +
+    '</div>';
+
+  marker.bindPopup(popupContent);
+  return marker;
+}
+
+function renderBins() {
+  binLayer.clearLayers();
+  binLocations.forEach(markerFor);
+}
+
+function refreshBins() {
+  fetch('/api/bins')
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data || !data.bins) return;
+      var w = data.bins.wetBin || {};
+      var d = data.bins.dryBin || {};
+      liveWet = w.level != null ? w.level : liveWet;
+      liveDry = d.level != null ? d.level : liveDry;
+      renderBins();
+    })
+    .catch(function(e) { console.error('Map data error:', e); });
+}
+
+// Filter map markers
+function filterMap(filter) {
+  // Update active button
+  document.querySelectorAll('.filter-btn').forEach(function(btn) { btn.classList.remove('active'); });
+  event.target.classList.add('active');
+
+  var avg = (liveWet + liveDry) / 2;
+  binLayer.eachLayer(function(marker) {
+    var show = true;
+    if (filter === 'full' && avg < 80) show = false;
+    if (filter === 'warning' && (avg < 60 || avg >= 80)) show = false;
+    if (filter === 'ok' && avg >= 60) show = false;
+
+    if (show) {
+      marker.addTo(binLayer);
+    } else {
+      binLayer.removeLayer(marker);
+    }
+  });
+}
+
+// Get user location
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(function(position) {
+    var userLat = position.coords.latitude;
+    var userLng = position.coords.longitude;
+
+    // Add user location marker
+    L.marker([userLat, userLng], {
+      icon: L.divIcon({
+        className: 'user-marker',
+        html: '<div style="width: 20px; height: 20px; background: #0078ff; border-radius: 50%; border: 3px solid white; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);"></div>',
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+      })
+    }).addTo(map).bindPopup('Your Location');
+
+    // Center map on user location
+    map.setView([userLat, userLng], 15);
+  });
+}
+
+// Load live data and auto-refresh every 30 seconds
+refreshBins();
+setInterval(refreshBins, 30000);
+</script>
+
+</body>
+</html>

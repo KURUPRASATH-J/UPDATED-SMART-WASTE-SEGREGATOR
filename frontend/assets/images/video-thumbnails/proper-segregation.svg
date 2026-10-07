@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d1b2a"/>
+      <stop offset="1" stop-color="#123a2f"/>
+    </linearGradient>
+    <linearGradient id="wet" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#33c6ff"/>
+      <stop offset="1" stop-color="#0a7fd4"/>
+    </linearGradient>
+    <linearGradient id="dry" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3dff9e"/>
+      <stop offset="1" stop-color="#0aa15c"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0 L0 0 0 40" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.06"/>
+    </pattern>
+  </defs>
+  <rect width="640" height="360" fill="url(#bg)"/>
+  <rect width="640" height="360" fill="url(#grid)"/>
+  <path d="M320 0 L640 0 L640 360 L320 360 Z" fill="#ffffff" opacity="0.035"/>
+  <path d="M176 132 L320 360" stroke="#ffffff" stroke-width="2" opacity="0.25"/>
+  <g transform="translate(120,112)">
+    <rect x="6" y="60" width="118" height="100" rx="14" fill="url(#wet)" stroke="#ffffff" stroke-width="4"/>
+    <rect x="16" y="44" width="98" height="20" rx="9" fill="#ffffff" opacity="0.92"/>
+    <path d="M78 34 C 90 46, 84 58, 78 58 C 72 58, 66 46, 78 34 Z" fill="#ffffff" opacity="0.92"/>
+    <path d="M44 96 c 0 -12 16 -12 16 0 c 0 6 -4 8 -8 12 c -4 -4 -8 -6 -8 -12 z" fill="#ffffff" opacity="0.85"/>
+    <text x="62" y="196" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#33c6ff">WET WASTE</text>
+  </g>
+  <g transform="translate(402,112)">
+    <rect x="6" y="60" width="118" height="100" rx="14" fill="url(#dry)" stroke="#ffffff" stroke-width="4"/>
+    <rect x="16" y="44" width="98" height="20" rx="9" fill="#ffffff" opacity="0.92"/>
+    <path d="M52 92 c 10 -6 8 -14 8 -14 c 0 8 8 10 8 20 c 0 12 -10 20 -22 20 c 8 -2 10 -8 6 -26 z" fill="#ffffff" opacity="0.9"/>
+    <text x="62" y="196" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#3dff9e">DRY WASTE</text>
+  </g>
+  <text x="36" y="66" font-family="Poppins, Arial, sans-serif" font-size="26" font-weight="700" fill="#ffffff" opacity="0.9">PROPER WASTE SEGREGATION</text>
+</svg>

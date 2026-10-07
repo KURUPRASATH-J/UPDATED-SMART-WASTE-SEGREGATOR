@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" sizes="32x32" href="/frontend/assets/images/favicon-32x32.png?v=1">
+<link rel="icon" type="image/png" sizes="16x16" href="/frontend/assets/images/favicon-16x16.png?v=1">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo.png?v=1" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo-dark.png?v=1" media="(prefers-color-scheme: dark)">
+<link rel="shortcut icon" href="/frontend/assets/images/favicon.ico?v=1">
+<link rel="apple-touch-icon" sizes="180x180" href="/frontend/assets/images/apple-touch-icon.png?v=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - Smart Waste Segregator</title>
+<meta name="description" content="Real-time IoT waste monitoring dashboard with smart predictions">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#091020">
+<link rel="stylesheet" href="/frontend/shared/css/themes.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+
+/* ====== GLOBAL ====== */
+/* Theme-driven colors live in shared/css/themes.css (--bg-primary, --bg-card,
+   --border-color, --text-primary, --text-secondary, --accent-primary,
+   --accent-secondary, --glow, --shadow) and change under body.theme-{theme}.
+   Tokens below are structural or data-status values that must stay constant. */
+:root{
+  --radius:16px;--radius-sm:10px;
+  --wet:#2196F3;--dry:#4CAF50;--danger:#ff4757;--warn:#ffa502;
+  --section-gap:20px;--ticker-height:36px;--ticker-speed:45;
+}
+
+body{font-family:'Inter',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 0%,color-mix(in srgb,var(--accent-primary) 8%,transparent),transparent 50%),radial-gradient(ellipse at 80% 100%,color-mix(in srgb,var(--accent-secondary) 5%,transparent),transparent 50%);pointer-events:none;z-index:0;}
+
+/* ====== PARTICLES ====== */
+.particle{position:fixed;border-radius:50%;pointer-events:none;opacity:0;animation:particleFloat linear infinite;}
+@keyframes particleFloat{0%{opacity:0;transform:translateY(100vh) scale(0)}10%{opacity:0.6}90%{opacity:0.6}100%{opacity:0;transform:translateY(-10vh) scale(1)}}
+
+/* ====== SIDEBAR ====== */
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:999;display:none;transition:opacity 0.3s;}
+.sidebar{position:fixed;left:0;top:0;height:100%;width:260px;background:var(--bg-card);backdrop-filter:blur(30px);border-right:1px solid var(--border-color);z-index:1000;transform:translateX(-100%);transition:transform 0.35s cubic-bezier(.4,0,.2,1);overflow-y:auto;padding:20px 12px;}
+.sidebar.active{transform:translateX(0);}
+.close-btn{position:absolute;top:16px;right:14px;background:none;border:none;color:var(--text-secondary);font-size:1.5rem;cursor:pointer;transition:all 0.2s;}.close-btn:hover{color:var(--danger);transform:rotate(90deg);}
+.sidebar-brand{display:flex;align-items:center;gap:12px;padding:12px 8px;margin-bottom:28px;}
+.sidebar-logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));display:flex;align-items:center;justify-content:center;font-weight:800;color:#0a0e1a;font-size:1.1rem;box-shadow:0 4px 15px color-mix(in srgb,var(--accent-primary) 30%,transparent);}
+.sidebar-title{font-size:1.05rem;font-weight:700;color:var(--text-primary);}
+.sidebar-sub{font-size:0.65rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1.5px;}
+.nav-links{list-style:none;}.nav-links li{margin-bottom:2px;}
+.nav-links a{display:flex;align-items:center;gap:12px;padding:11px 16px;color:var(--text-secondary);text-decoration:none;border-radius:var(--radius-sm);transition:all 0.2s;font-size:0.88rem;font-weight:500;position:relative;}
+.nav-links a:hover{background:var(--bg-secondary);color:var(--text-primary);transform:translateX(4px);}
+.nav-links a.active{background:linear-gradient(135deg,color-mix(in srgb,var(--accent-primary) 12%,transparent),color-mix(in srgb,var(--accent-secondary) 6%,transparent));color:var(--accent-primary);font-weight:600;border-left:3px solid var(--accent-primary);}
+.nav-dot{display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:0.65rem;padding:2px 7px;border-radius:10px;font-weight:700;}
+
+/* ====== TOP BAR ====== */
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar-height);background:var(--bg-card);backdrop-filter:blur(20px);border-bottom:1px solid var(--border-color);z-index:998;display:flex;align-items:center;padding:0 24px 0 76px;gap:16px;}
+.top-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));display:flex;align-items:center;justify-content:center;font-weight:700;color:#0a0e1a;font-size:1rem;border:2px solid var(--border-color);cursor:pointer;overflow:hidden;flex-shrink:0;text-decoration:none;transition:transform .2s;}
+.top-avatar:hover{transform:scale(1.06);}
+.top-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;}
+.hamburger{position:fixed;top:13px;left:24px;z-index:999;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-primary);font-size:1.2rem;padding:8px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:all 0.2s;}.hamburger:hover{background:var(--bg-secondary);}
+.topbar-title{font-size:1rem;font-weight:600;flex:1;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.eco-badge{display:flex;align-items:center;gap:6px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent-primary) 14%,transparent),color-mix(in srgb,var(--accent-secondary) 8%,transparent));border:1px solid color-mix(in srgb,var(--accent-primary) 22%,transparent);padding:6px 14px;border-radius:20px;font-size:0.78rem;font-weight:600;color:var(--accent-primary);}
+.streak-badge{display:flex;align-items:center;gap:5px;background:rgba(255,165,2,0.1);border:1px solid rgba(255,165,2,0.15);padding:6px 12px;border-radius:20px;font-size:0.78rem;font-weight:600;color:var(--warning);}
+.streak-flame{animation:flamePulse 0.8s ease infinite alternate;}
+@keyframes flamePulse{from{transform:scale(1)}to{transform:scale(1.2)}}
+.notif-link{position:relative;display:flex;align-items:center;justify-content:center;width:38px;height:38px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-decoration:none;font-size:1.1rem;transition:all 0.2s;}
+.notif-link:hover{background:var(--bg-secondary);border-color:color-mix(in srgb,var(--accent-primary) 25%,transparent);}
+.notif-count{position:absolute;top:-6px;right:-6px;background:var(--danger);color:#fff;font-size:0.62rem;font-weight:700;min-width:18px;height:18px;padding:0 4px;border-radius:9px;display:none;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(255,71,87,0.4);}
+
+/* ====== MAIN LAYOUT ====== */
+.main{max-width:1400px;margin:80px auto 0;padding:0 20px calc(var(--ticker-height) + 24px + env(safe-area-inset-bottom, 0px));position:relative;z-index:1;display:grid;grid-template-columns:1fr;row-gap:var(--section-gap);}
+
+/* ====== ALERT BANNER ====== */
+.alert-banner{display:flex;align-items:center;gap:12px;border-radius:var(--radius);padding:14px 18px;background:color-mix(in srgb,var(--warning) 9%,transparent);border:1px solid color-mix(in srgb,var(--warning) 30%,transparent);color:var(--warning);font-size:0.9rem;font-weight:600;animation:toastIn 0.4s ease;}
+.alert-banner[hidden]{display:none;}
+.alert-banner.danger{background:color-mix(in srgb,var(--danger) 9%,transparent);border-color:color-mix(in srgb,var(--danger) 30%,transparent);color:var(--danger);}
+.alert-dismiss{margin-left:auto;background:none;border:none;color:inherit;font-size:1.05rem;cursor:pointer;padding:2px 6px;border-radius:8px;opacity:.75;line-height:1;flex-shrink:0;}
+.alert-dismiss:hover{opacity:1;background:rgba(255,255,255,.14);}
+
+/* ====== HERO + GOAL NUDGE ====== */
+.hero-row{display:flex;flex-direction:column;gap:4px;}
+.hero-line{font-size:1.05rem;font-weight:700;}
+.hero-ok{color:var(--success);}
+.hero-warn{color:var(--danger);}
+.hero-skel{display:inline-block;height:20px;width:55%;vertical-align:middle;}
+.goal-line{font-size:0.8rem;color:var(--text-secondary);}
+.goal-skel{display:inline-block;height:12px;width:40%;vertical-align:middle;}
+
+/* ====== STAT CARDS ====== */
+.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--section-gap);align-items:stretch;}
+.stats-grid>*{min-width:0;}
+.data-status{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0;padding:6px 12px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:color-mix(in srgb,var(--bg-card) 70%,transparent);font-size:0.78rem;color:var(--text-secondary);}
+.data-status[hidden]{display:none;}
+.data-status .test-chip{border:1px solid color-mix(in srgb,var(--warning) 45%,transparent);color:var(--warning);padding:2px 8px;border-radius:999px;font-weight:700;font-size:0.7rem;white-space:nowrap;}
+.stats-grid.is-stale .stat-card{opacity:.45;}
+.trend-empty{position:absolute;inset:0;display:none;align-items:center;justify-content:center;color:var(--text-secondary);font-size:0.85rem;text-align:center;padding:0 20px;}
+.stat-card{display:flex;flex-direction:column;align-items:center;text-align:center;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:18px 16px;position:relative;overflow:hidden;transition:all 0.3s;cursor:default;}
+.stat-card:hover{border-color:color-mix(in srgb,var(--text-primary) 12%,transparent);transform:translateY(-3px);box-shadow:var(--shadow);}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius) var(--radius) 0 0;}
+.stat-card:nth-child(1)::before{background:linear-gradient(90deg,var(--accent-primary),var(--accent-secondary));}
+.stat-card:nth-child(2)::before{background:linear-gradient(90deg,var(--wet),#64B5F6);}
+.stat-card:nth-child(3)::before{background:linear-gradient(90deg,var(--dry),#81C784);}
+.stat-card:nth-child(4)::before{background:linear-gradient(90deg,var(--warn),#FFD54F);}
+.stat-body{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;width:100%;flex:1;}
+.stat-icon{font-size:1.55rem;line-height:1.3;}
+.stat-val{font-size:clamp(1.3rem,2.3vw,1.85rem);font-weight:800;line-height:1.15;white-space:nowrap;}
+.stat-label{font-size:0.72rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;line-height:1.35;min-height:2.7em;display:flex;align-items:center;justify-content:center;text-align:center;}
+.stat-trend{font-size:0.7rem;color:var(--accent-secondary);line-height:1.35;text-align:center;max-width:100%;margin-top:8px;}
+.count-up{transition:all 0.6s cubic-bezier(.17,.67,.83,.67);}
+
+/* ====== 3D BIN VISUALIZATION ====== */
+.bins-section{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--section-gap);}
+.bins-section>*{min-width:0;}
+.bin-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:24px;transition:all 0.4s;position:relative;overflow:hidden;}
+.bin-card:hover{border-color:color-mix(in srgb,var(--text-primary) 12%,transparent);transform:translateY(-2px);}
+.bin-card.alert{animation:alertPulse 1.5s ease infinite;}
+@keyframes alertPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,71,87,0)}50%{box-shadow:0 0 25px 5px rgba(255,71,87,0.2)}}
+.bin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.bin-title{font-size:1rem;font-weight:700;}
+.bin-status{font-size:0.72rem;padding:4px 12px;border-radius:20px;font-weight:600;}
+.bin-status.ok{background:rgba(76,175,80,0.15);color:var(--success);}
+.bin-status.warning{background:rgba(255,165,2,0.15);color:var(--warning);}
+.bin-status.critical{background:rgba(255,71,87,0.15);color:var(--danger);}
+
+/* 3D Bin Container */
+.bin-3d-wrap{perspective:600px;display:flex;justify-content:center;margin:16px 0;}
+.bin-3d{width:140px;height:200px;position:relative;transform-style:preserve-3d;transform:rotateX(5deg) rotateY(-5deg);transition:transform 0.5s;}
+.bin-card:hover .bin-3d{transform:rotateX(2deg) rotateY(-8deg);}
+.bin-body{position:absolute;inset:0;border-radius:12px 12px 16px 16px;border:2px solid rgba(255,255,255,0.08);overflow:hidden;background:rgba(0,0,0,0.3);}
+.bin-lid{position:absolute;top:-8px;left:-4px;right:-4px;height:16px;border-radius:10px 10px 4px 4px;transform-origin:left center;transition:transform 0.5s cubic-bezier(.4,0,.2,1);z-index:2;}
+.bin-lid.open{transform:rotateZ(-45deg);}
+.wet .bin-lid{background:linear-gradient(135deg,#1565C0,#42A5F5);}
+.dry .bin-lid{background:linear-gradient(135deg,#2E7D32,#66BB6A);}
+
+/* Fill Level */
+.bin-fill{position:absolute;bottom:0;left:0;right:0;transition:height 1.5s cubic-bezier(.4,0,.2,1);overflow:hidden;}
+.wet .bin-fill{background:linear-gradient(to top,#0D47A1,#1976D2,#42A5F5);}
+.dry .bin-fill{background:linear-gradient(to top,#1B5E20,#388E3C,#66BB6A);}
+.bin-wave{position:absolute;top:-8px;left:0;width:200%;height:16px;animation:wave 3s linear infinite;}
+.wet .bin-wave{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16'%3E%3Cpath d='M0,8 Q25,0 50,8 T100,8 T150,8 T200,8 V16 H0Z' fill='rgba(66,165,245,0.5)'/%3E%3C/svg%3E") repeat-x;}
+.dry .bin-wave{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16'%3E%3Cpath d='M0,8 Q25,0 50,8 T100,8 T150,8 T200,8 V16 H0Z' fill='rgba(102,187,106,0.5)'/%3E%3C/svg%3E") repeat-x;}
+@keyframes wave{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+.bin-percentage{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:1.8rem;font-weight:800;text-shadow:0 2px 8px rgba(0,0,0,0.5);z-index:1;}
+.bin-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);font-size:2.2rem;z-index:1;opacity:0.3;filter:grayscale(50%);}
+
+/* Bin Info Below */
+.bin-info{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+.bin-info-item{text-align:center;padding:8px;background:var(--bg-card);border-radius:var(--radius-sm);border:1px solid var(--border-color);}
+.bin-info-val{font-size:1rem;font-weight:700;}
+.bin-info-label{font-size:0.65rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;}
+
+/* ====== CHARTS & DASHBOARD WIDGETS ====== */
+.content-grid{display:grid;grid-template-columns:2fr 1fr;gap:var(--section-gap);}
+.content-grid>*{min-width:0;}
+.card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:20px;transition:all 0.3s;}
+.card:hover{border-color:color-mix(in srgb,var(--text-primary) 10%,transparent);}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.card-title{font-size:0.95rem;font-weight:700;}
+.card-sub{font-size:0.72rem;color:var(--text-secondary);}
+.chart-wrap{position:relative;height:200px;}.chart-wrap canvas{width:100%!important;height:100%!important;}
+.dash-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--section-gap);align-items:stretch;padding-right:80px;}
+.dash-grid>*{min-width:0;}
+.mini-card{display:flex;flex-direction:column;}
+.mini-card .card-header{flex-shrink:0;}
+.mini-card .widget-body{flex:1;justify-content:center;text-align:center;}
+.mini-card .card-title{font-size:0.85rem;}
+.widget-body{min-height:64px;font-size:0.82rem;color:var(--text-primary);display:flex;flex-direction:column;gap:8px;}
+.widget-empty{color:var(--text-secondary);line-height:1.6;}
+.widget-note{font-size:0.7rem;color:var(--text-secondary);}
+.today-line{line-height:1.7;font-size:0.86rem;}
+.schedule-line{line-height:1.7;font-size:0.86rem;}
+.health-item{display:flex;align-items:center;justify-content:center;gap:8px;font-size:0.82rem;}
+.health-item .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--border-color);}
+.health-item .dot.ok{background:var(--success);box-shadow:0 0 8px var(--success);}
+.health-item .dot.off{background:var(--danger);box-shadow:0 0 8px var(--danger);}
+.health-item .dot.warn{background:var(--warning);box-shadow:0 0 8px var(--warning);}
+.health-item .dot.pulse{animation:flamePulse 1.2s ease infinite alternate;}
+.dash-link{color:var(--accent-primary);text-decoration:underline;}
+
+/* ====== QUICK ACTION BUTTONS ====== */
+.qa-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:16px 18px;border-radius:var(--radius);border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-primary);font-size:0.88rem;font-weight:600;cursor:pointer;transition:all .25s;font-family:'Inter',sans-serif;}
+.qa-btn:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:color-mix(in srgb,var(--accent-primary) 30%,transparent);}
+.qa-btn .qa-ico{font-size:1.3rem;}
+
+/* ====== MODALS ====== */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);z-index:1200;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal.show{display:flex;}
+.modal-box{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:24px;width:100%;max-width:440px;animation:slideUp 0.3s ease;box-shadow:var(--shadow);}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.modal-title{font-size:1rem;font-weight:700;}
+.modal-close{background:none;border:none;color:var(--text-secondary);font-size:1.2rem;cursor:pointer;transition:all 0.2s;}
+.modal-close:hover{color:var(--danger);transform:rotate(90deg);}
+.modal-body .widget-note{margin-bottom:14px;line-height:1.6;}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.form-field label{display:block;font-size:0.72rem;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}
+.form-field input[type=number]{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border-color);background:var(--bg-secondary);color:var(--text-primary);font-size:0.9rem;outline:none;}
+.form-field input[type=number]:focus{border-color:var(--accent-primary);}
+.radio-field{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.radio-field label{display:flex;align-items:center;gap:9px;font-size:0.85rem;cursor:pointer;padding:10px 12px;border:1px solid var(--border-color);border-radius:var(--radius-sm);transition:all 0.2s;}
+.radio-field label:hover{border-color:color-mix(in srgb,var(--accent-primary) 30%,transparent);}
+.radio-field input[type=radio]{accent-color:var(--accent-primary);}
+.btn{border:none;border-radius:var(--radius-sm);padding:10px 18px;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;}
+.btn-primary{background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));color:#0a0e1a;}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+.btn-ghost{background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);}
+.btn-ghost:hover{color:var(--text-primary);border-color:var(--text-secondary);}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;}
+
+/* ====== LIVE TICKER ====== */
+.ticker{position:fixed;bottom:0;left:0;right:0;height:var(--ticker-height);background:var(--bg-card);backdrop-filter:blur(20px);border-top:1px solid var(--border-color);z-index:997;overflow:hidden;display:flex;align-items:center;touch-action:manipulation;}
+.ticker:focus-visible{outline:2px solid var(--accent-primary);outline-offset:-2px;}
+.ticker-label{background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));color:#000;font-size:0.7rem;font-weight:700;padding:4px 14px;text-transform:uppercase;letter-spacing:1px;flex-shrink:0;}
+.ticker-content{flex:1;overflow:hidden;white-space:nowrap;display:flex;align-items:center;min-width:0;}
+.ticker-track{display:flex;flex-shrink:0;will-change:transform;animation:tickerScroll var(--ticker-duration,60s) linear infinite;}
+.ticker:hover .ticker-track,.ticker:active .ticker-track,.ticker:focus-visible .ticker-track{animation-play-state:paused;}
+.ticker-item{flex-shrink:0;padding:0 20px;font-size:0.78rem;color:var(--text-secondary);}
+@keyframes tickerScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){
+  .ticker-track{animation:none!important;}
+  .ticker-item:first-child{flex-shrink:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ticker-item:nth-child(2){display:none;}
+}
+
+/* ====== CONFETTI ====== */
+.confetti-piece{position:fixed;width:10px;height:10px;z-index:10001;pointer-events:none;animation:confettiFall 3s ease forwards;}
+@keyframes confettiFall{0%{opacity:1;transform:translateY(-100vh) rotate(0deg)}100%{opacity:0;transform:translateY(100vh) rotate(720deg)}}
+
+/* ====== SKELETON LOADING ====== */
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,0.03) 25%,rgba(255,255,255,0.06) 50%,rgba(255,255,255,0.03) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ====== RESPONSIVE ====== */
+@media(max-width:1100px){.dash-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.dash-grid>*:nth-child(3),.dash-grid>*:nth-child(6){grid-column:1/-1;}}
+@media(max-width:1024px){.content-grid{grid-template-columns:1fr;}.stats-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:768px){.main{margin-top:72px;padding:0 12px calc(var(--ticker-height) + 24px + env(safe-area-inset-bottom, 0px));}.stats-grid{grid-template-columns:1fr 1fr;}.bins-section{grid-template-columns:1fr;}.topbar{padding:0 12px 0 70px;}.modal-grid{grid-template-columns:1fr;}.dash-grid{padding-right:72px;}}
+@media(max-width:640px){.dash-grid{grid-template-columns:1fr;}}
+@media(max-width:480px){.stats-grid{grid-template-columns:1fr;}}
+</style>
+<script type="module" src="/frontend/shared/js/pwa.js"></script>
+</head>
+<body>
+
+<!-- PARTICLES -->
+<div id="particles"></div>
+
+<!-- SIDEBAR -->
+{% set sidebar_brand %}
+<div class="sidebar-brand">
+    <img class="brand-logo brand-logo-light" src="/frontend/assets/images/logo.png" alt="Smart Waste Segregator logo" width="42" height="42">
+    <img class="brand-logo brand-logo-dark" src="/frontend/assets/images/logo-dark.png" alt="Smart Waste Segregator logo" width="42" height="42">
+    <div><div class="sidebar-title">Smart Waste Segregator</div><div class="sidebar-sub">v3.0</div></div>
+  </div>
+{% endset %}
+{% include '_sidebar.html' %}
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <span class="topbar-title">📊 Dashboard</span>
+  <div class="topbar-right">
+    <a href="/pages/profile.html" class="top-avatar" id="topAvatar" title="My Profile">U</a>
+    <a href="/pages/notifications.html" class="notif-link" title="Notifications">🔔<span class="notif-count" id="notifCount">0</span></a>
+    <div class="streak-badge" id="streakBadge"><span class="streak-flame">🔥</span><span id="streakCount">0</span> day streak</div>
+    <div class="eco-badge" id="ecoBadge">🌿 <span id="ecoScore">0</span> pts</div>
+  </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- a. ALERT BANNER -->
+  <section class="alert-banner" id="alertBanner" hidden>
+    <span id="alertBannerText"></span>
+    <button class="alert-dismiss" id="alertDismiss" title="Dismiss">✕</button>
+  </section>
+
+  <!-- b. HERO PREDICTION + GOAL NUDGE -->
+  <section class="hero-row">
+    <div class="hero-line" id="heroLine"><span class="skeleton hero-skel"></span></div>
+    <div class="goal-line" id="goalLine"><span class="skeleton goal-skel"></span></div>
+  </section>
+
+  <!-- c. STAT CARDS -->
+  <section class="stats-grid" id="statsGrid">
+    <div class="stat-card"><div class="stat-body"><div class="stat-icon">📊</div><div class="stat-val" id="totalReadings">--</div><div class="stat-label">Total Readings</div></div><div class="stat-trend" id="trendReadings"></div></div>
+    <div class="stat-card"><div class="stat-body"><div class="stat-icon">💧</div><div class="stat-val" id="avgWet">--</div><div class="stat-label">Avg Wet (24h)</div></div><div class="stat-trend" id="trendWet"></div></div>
+    <div class="stat-card"><div class="stat-body"><div class="stat-icon">♻️</div><div class="stat-val" id="avgDry">--</div><div class="stat-label">Avg Dry (24h)</div></div><div class="stat-trend" id="trendDry"></div></div>
+    <div class="stat-card"><div class="stat-body"><div class="stat-icon">🌍</div><div class="stat-val" id="co2Saved">--</div><div class="stat-label">CO₂ Saved (kg)</div></div><div class="stat-trend" id="trendCo2"></div></div>
+  </section>
+
+  <!-- c1. DATA STATUS BAR (live/offline honesty + test-data indicator) -->
+  <div class="data-status" id="dataStatusBar">
+    <span id="dataStatusText">📡 Waiting for the waste sensor…</span>
+    <span class="test-chip" id="testChip" hidden></span>
+  </div>
+
+  <!-- d. 3D BIN VISUALIZATION -->
+  <section class="bins-section">
+    <!-- WET BIN -->
+    <div class="bin-card wet" id="wetBinCard">
+      <div class="bin-header">
+        <span class="bin-title">💧 Wet Bin</span>
+        <span class="bin-status ok" id="wetStatus">Normal</span>
+      </div>
+      <div class="bin-3d-wrap">
+        <div class="bin-3d">
+          <div class="bin-lid" id="wetLid"></div>
+          <div class="bin-body">
+            <span class="bin-icon">💧</span>
+            <div class="bin-fill" id="wetFill" style="height:0%">
+              <div class="bin-wave"></div>
+            </div>
+            <div class="bin-percentage" id="wetPercent">0%</div>
+          </div>
+        </div>
+      </div>
+      <div class="bin-info">
+        <div class="bin-info-item"><div class="bin-info-val" id="wetDistance">--</div><div class="bin-info-label">Distance (cm)</div></div>
+        <div class="bin-info-item"><div class="bin-info-val" id="wetRate">--</div><div class="bin-info-label">Fill Rate/hr</div></div>
+        <div class="bin-info-item"><div class="bin-info-val" id="wetTTF">--</div><div class="bin-info-label">Time to Full</div></div>
+        <div class="bin-info-item"><div class="bin-info-val" id="wetGas">--</div><div class="bin-info-label">Air Quality</div></div>
+      </div>
+    </div>
+    <!-- DRY BIN -->
+    <div class="bin-card dry" id="dryBinCard">
+      <div class="bin-header">
+        <span class="bin-title">♻️ Dry Bin</span>
+        <span class="bin-status ok" id="dryStatus">Normal</span>
+      </div>
+      <div class="bin-3d-wrap">
+        <div class="bin-3d">
+          <div class="bin-lid" id="dryLid"></div>
+          <div class="bin-body">
+            <span class="bin-icon">♻️</span>
+            <div class="bin-fill" id="dryFill" style="height:0%">
+              <div class="bin-wave"></div>
+            </div>
+            <div class="bin-percentage" id="dryPercent">0%</div>
+          </div>
+        </div>
+      </div>
+      <div class="bin-info">
+        <div class="bin-info-item"><div class="bin-info-val" id="dryDistance">--</div><div class="bin-info-label">Distance (cm)</div></div>
+        <div class="bin-info-item"><div class="bin-info-val" id="dryRate">--</div><div class="bin-info-label">Fill Rate/hr</div></div>
+        <div class="bin-info-item"><div class="bin-info-val" id="dryTTF">--</div><div class="bin-info-label">Time to Full</div></div>
+        <div class="bin-info-item"><div class="bin-info-val" id="dryGas">--</div><div class="bin-info-label">Air Quality</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- e. FILL LEVEL TRENDS (WIDE) + WEEKLY COMPARISON (NARROW) -->
+  <section class="content-grid">
+    <div class="card">
+      <div class="card-header"><span class="card-title">📈 Fill Level Trends</span><span class="card-sub">Last 24 hours</span></div>
+      <div class="chart-wrap" id="trendChartWrap"><canvas id="trendChart"></canvas><div class="trend-empty" id="trendEmpty">No readings yet — waiting for the sensor.</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">📆 Weekly Comparison</span><span class="card-sub">This week vs last week</span></div>
+      <div class="chart-wrap" id="weeklyBox"><canvas id="weeklyChart"></canvas></div>
+      <div class="widget-note" id="weeklyTakeaway" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <!-- f+g. TODAY | SCHEDULE | DEVICE HEALTH + QUICK ACTIONS (one shared grid) -->
+  <section class="dash-grid">
+    <div class="card mini-card">
+      <div class="card-header"><span class="card-title">🌱 Today's Impact</span></div>
+      <div class="widget-body" id="todayBody"><div class="skeleton" style="height:56px"></div></div>
+    </div>
+    <div class="card mini-card">
+      <div class="card-header"><span class="card-title">🗓️ Collection Schedule</span></div>
+      <div class="widget-body" id="scheduleBody"><div class="skeleton" style="height:56px"></div></div>
+    </div>
+    <div class="card mini-card">
+      <div class="card-header"><span class="card-title">🩺 Device Health</span></div>
+      <div class="widget-body" id="healthBody"><div class="skeleton" style="height:56px"></div></div>
+    </div>
+    <button type="button" class="qa-btn" id="qaSimulateBtn" onclick="qaSimulate()"><span class="qa-ico">🧪</span> Simulate a reading</button>
+    <button type="button" class="qa-btn" id="qaCollectBtn" onclick="qaCollect()"><span class="qa-ico">🚚</span> Mark bin as collected</button>
+    <button type="button" class="qa-btn" id="qaTelegramBtn" onclick="qaTelegram()"><span class="qa-ico">📨</span> Send test Telegram alert</button>
+  </section>
+
+</main>
+
+<!-- SIMULATE READING MODAL -->
+<div class="modal" id="simulateModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">🧪 Simulate a reading</span>
+      <button class="modal-close" onclick="closeModal('simulateModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="widget-note">Send a test wet/dry reading through the real sensor pipeline (clamped 0-100%). The reading is recorded with the label <b>TEST</b> — it is excluded from all dashboard stats, bin levels, device health and predictions.</p>
+      <div class="modal-grid">
+        <div class="form-field"><label for="simWet">Wet level (%)</label><input type="number" id="simWet" min="0" max="100" value="0"></div>
+        <div class="form-field"><label for="simDry">Dry level (%)</label><input type="number" id="simDry" min="0" max="100" value="0"></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('simulateModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="qaRunSimulate()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- MARK COLLECTED MODAL -->
+<div class="modal" id="collectModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">🚚 Mark bin as collected</span>
+      <button class="modal-close" onclick="closeModal('collectModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="widget-note">Resets the chosen bin(s) to 0%, logs the collection to your account and awards +10 eco points.</p>
+      <div class="radio-field">
+        <label><input type="radio" name="collectBin" value="wetBin" checked> 💧 Wet bin</label>
+        <label><input type="radio" name="collectBin" value="dryBin"> ♻️ Dry bin</label>
+        <label><input type="radio" name="collectBin" value="both"> 🚚 Both bins</label>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('collectModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="qaRunCollect()">Mark as collected</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIVE TICKER -->
+<div class="ticker" id="ticker" tabindex="0" aria-label="Live status updates">
+  <div class="ticker-label">LIVE</div>
+  <div class="ticker-content">
+    <div class="ticker-track" id="tickerTrack">
+      <span class="ticker-item" id="tickerText">Smart Waste Segregator v3.0 — live dashboard — waiting for device data</span>
+      <span class="ticker-item" id="tickerTextDup" aria-hidden="true"></span>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+// ============ UTILITIES ============
+function $(id){return document.getElementById(id);}
+function animateCount(el,target,suffix){
+  var start=parseInt(el.textContent)||0,diff=target-start,steps=30,step=0;
+  if(diff===0){el.textContent=target+(suffix||'');return;}
+  var timer=setInterval(function(){step++;var val=Math.round(start+diff*(step/steps));el.textContent=val+(suffix||'');if(step>=steps){clearInterval(timer);el.textContent=target+(suffix||'');}},20);
+}
+function formatTTF(min){
+  if(!min||min<=0)return'N/A';
+  if(min<60)return min+'m';
+  if(min<1440)return Math.floor(min/60)+'h '+min%60+'m';
+  return Math.floor(min/1440)+'d';
+}
+function tickerDuration(){
+  var track=$('tickerTrack');
+  var first=track?track.firstElementChild:null;
+  if(!first)return;
+  var speed=parseFloat(getComputedStyle($('ticker')).getPropertyValue('--ticker-speed'))||45;
+  var w=first.scrollWidth||1;
+  track.style.animationDuration=Math.max(2,Math.round(w/speed*10)/10)+'s';
+}
+function setTickerText(text){
+  var el=$('tickerText');if(!el)return;
+  text=String(text==null?'':text);
+  el.textContent=text;
+  var dup=$('tickerTextDup');if(dup)dup.textContent=text;
+  tickerDuration();
+}
+function addTickerEvent(msg){
+  var el=$('tickerText');
+  setTickerText(el.textContent?el.textContent+' — '+msg:msg);
+}
+(function(){
+  var dup=$('tickerTextDup');
+  if(dup)dup.textContent=$('tickerText').textContent;
+  tickerDuration();
+  window.addEventListener('resize',tickerDuration);
+  var ticker=$('ticker'),track=$('tickerTrack');
+  if(ticker&&track){
+    ticker.addEventListener('touchstart',function(){track.style.animationPlayState='paused';},{passive:true});
+    ['touchend','touchcancel'].forEach(function(ev){ticker.addEventListener(ev,function(){track.style.animationPlayState='';},{passive:true});});
+  }
+})();
+function escapeHtml(s){return String(s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+// Generic widget body state renderer: 'ok' renders content, 'empty'/'error'
+// render an inline message (both drive skeleton hiding on first load).
+function setWidget(bodyId,state,content){
+  var b=$(bodyId);if(!b)return;
+  if(state==='ok'){b.innerHTML=content;}
+  else{b.innerHTML='<div class="widget-empty">'+content+'</div>';}
+}
+
+// ============ PARTICLES ============
+(function(){var c=$('particles');for(var i=0;i<25;i++){var p=document.createElement('div');p.className='particle';var s=Math.random()*3+1;p.style.cssText='width:'+s+'px;height:'+s+'px;left:'+Math.random()*100+'%;background:rgba(0,212,255,'+(Math.random()*0.3+0.1)+');animation-duration:'+(Math.random()*15+10)+'s;animation-delay:'+(Math.random()*10)+'s;';c.appendChild(p);}})();
+
+// ============ CONFETTI ============
+function fireConfetti(){
+  var colors=['#00d4ff','#00ff88','#ff6b6b','#ffa502','#a29bfe','#fd79a8'];
+  for(var i=0;i<60;i++){var c=document.createElement('div');c.className='confetti-piece';
+    c.style.cssText='left:'+Math.random()*100+'%;background:'+colors[Math.floor(Math.random()*colors.length)]+';border-radius:'+(Math.random()>0.5?'50%':'2px')+';width:'+(Math.random()*8+4)+'px;height:'+(Math.random()*8+4)+'px;animation-delay:'+Math.random()*0.5+'s;animation-duration:'+(Math.random()*2+2)+'s;';
+    document.body.appendChild(c);setTimeout(function(el){el.remove();},4000,c);}
+}
+
+// ============ UPDATE BIN UI ============
+function updateBinUI(type, data){
+  var prefix=type==='wetBin'?'wet':'dry';
+  // hasData is undefined on live bin_update packets — a real reading just
+  // arrived, so treat it as data. On initial summary renders it is explicit.
+  var hasData=data?(data.hasData!==undefined?data.hasData:true):false;
+  if(!hasData){
+    $(prefix+'Fill').style.height='0%';
+    $(prefix+'Percent').textContent='--';
+    $(prefix+'Distance').textContent='--';
+    $(prefix+'Rate').textContent='--';
+    $(prefix+'TTF').textContent='--';
+    $(prefix+'Gas').textContent='--';
+    var statusEl=$(prefix+'Status');
+    statusEl.textContent='No data';
+    statusEl.className='bin-status warning';
+    var card=$(prefix+'BinCard');
+    card.classList.remove('alert');
+    return;
+  }
+  var level=data.level||0, dist=data.distance||0, rate=data.fill_rate||0, ttf=data.time_to_full_min||0, gas=data.gas_level||0;
+  $(prefix+'Fill').style.height=level+'%';
+  $(prefix+'Percent').textContent=level+'%';
+  $(prefix+'Distance').textContent=dist.toFixed(1);
+  $(prefix+'Rate').textContent=(rate>0?'+':'')+rate.toFixed(1)+'%';
+  $(prefix+'TTF').textContent=formatTTF(ttf);
+  $(prefix+'Gas').textContent=gas>0?gas:'Good';
+
+  var statusEl=$(prefix+'Status');
+  var card=$(prefix+'BinCard');
+  if(level>=80){statusEl.textContent='Critical';statusEl.className='bin-status critical';card.classList.add('alert');}
+  else if(level>=50){statusEl.textContent='Warning';statusEl.className='bin-status warning';card.classList.remove('alert');}
+  else{statusEl.textContent='Normal';statusEl.className='bin-status ok';card.classList.remove('alert');}
+}
+
+// ============ HERO PREDICTION ============
+function renderHero(bins){
+  var el=$('heroLine');if(!el)return;
+  bins=bins||{};
+  var wet=bins.wetBin||{},dry=bins.dryBin||{};
+  var wetHas=wet.hasData!==undefined?wet.hasData:true;
+  var dryHas=dry.hasData!==undefined?dry.hasData:true;
+  if(!wetHas&&!dryHas){el.textContent='📡 Collecting data from the sensor — no readings yet.';el.className='hero-line';return;}
+  var wetLevel=wet.level||0,dryLevel=dry.level||0;
+  if(wetLevel>=100){el.textContent='💧 Wet bin is full — collection needed';el.className='hero-line hero-warn';}
+  else if(dryLevel>=100){el.textContent='♻️ Dry bin is full — collection needed';el.className='hero-line hero-warn';}
+  else{
+    var cands=[];
+    if(wet.fill_rate>0&&wet.time_to_full_min>0)cands.push({label:'Wet',ic:'💧',ttf:wet.time_to_full_min});
+    if(dry.fill_rate>0&&dry.time_to_full_min>0)cands.push({label:'Dry',ic:'♻️',ttf:dry.time_to_full_min});
+    if(!cands.length){el.textContent='✅ Both bins are stable, not filling';el.className='hero-line hero-ok';}
+    else{
+      cands.sort(function(a,b){return a.ttf-b.ttf;});
+      var c=cands[0];
+      el.textContent=c.ic+' '+c.label+' bin will be full in ~'+formatTTF(c.ttf);
+      el.className='hero-line';
+    }
+  }
+}
+
+// ============ GOAL NUDGE ============
+function renderGoal(g){
+  var el=$('goalLine');if(!el)return;
+  if(!g||typeof g.hasGoal==='undefined'){el.textContent='';return;}
+  if(g.hasGoal&&g.text){el.innerHTML=(g.icon||'🎯')+' '+escapeHtml(g.text);}
+  else if(g.allEarned){el.textContent='🎉 All badges and challenges completed — incredible work!';}
+  else{el.textContent='';}
+}
+
+// ============ ALERT BANNER ============
+function renderAlertBanner(anomalies,bins){
+  var el=$('alertBanner');if(!el)return;
+  var anom=(anomalies&&anomalies[0])||null;
+  var high=null;
+  bins=bins||{};
+  if((bins.wetBin&&bins.wetBin.hasData&&bins.wetBin.level)>=80)high={name:'Wet',level:bins.wetBin.level};
+  if(high==null&&(bins.dryBin&&bins.dryBin.hasData&&bins.dryBin.level)>=80)high={name:'Dry',level:bins.dryBin.level};
+  var dA=null,dH=null;
+  try{dA=sessionStorage.getItem('swDashAnomD');dH=sessionStorage.getItem('swDashHighD');}catch(e){}
+  var msg=null,key=null,danger=false;
+  if(anom&&String(anom.id)!==dA){
+    var when=anom.timestamp?new Date(anom.timestamp).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'';
+    msg=(anom.message||('Anomaly detected'+(anom.bin_type?' on '+anom.bin_type:'')))+(when?' at '+when:'');
+    key='anom:'+anom.id;danger=true;
+  }else if(high&&dH!==(high.name+':'+high.level)){
+    msg=high.name+' bin is at '+high.level+'% — collection recommended';
+    key='high:'+high.name+':'+high.level;danger=(high.level>=85);
+  }
+  if(!msg){el.hidden=true;return;}
+  el.classList.toggle('danger',danger);
+  $('alertBannerText').textContent=msg;
+  el.dataset.bannerKey=key;
+  el.hidden=false;
+}
+(function(){var el=$('alertDismiss');if(el)el.onclick=function(){
+  var b=$('alertBanner'),k=b.dataset.bannerKey||'x';
+  try{
+    if(k.indexOf('anom:')===0)sessionStorage.setItem('swDashAnomD',k.slice(5));
+    else sessionStorage.setItem('swDashHighD',k.slice(5));
+  }catch(e){}
+  b.hidden=true;
+};})();
+
+// ============ DASHBOARD WIDGETS ============
+function relTime(ts){
+  if(!ts)return'never';
+  var t=new Date(String(ts).replace(' ','T'));
+  if(isNaN(t.getTime()))return '—';
+  var s=Math.max(0,Math.round((Date.now()-t.getTime())/1000));
+  if(s<60)return s+'s ago';
+  if(s<3600)return Math.floor(s/60)+'m ago';
+  return Math.floor(s/3600)+'h '+(Math.floor((s%3600)/60))+'m ago';
+}
+
+function renderToday(t){
+  if(!t){setWidget('todayBody','error','Could not load today\'s impact.');return;}
+  if(!t.collections){setWidget('todayBody','empty','No collections recorded today yet.');return;}
+  setWidget('todayBody','ok','<div class="today-line">Today: <b>'+t.co2Saved+' kg</b> CO₂ saved, <b>'+t.waterSaved+' L</b> water saved, <b>'+t.treesSaved+' trees</b></div><div class="widget-note">collections recorded today: '+t.collections+'</div>');
+}
+
+function renderSchedule(s){
+  if(!s){setWidget('scheduleBody','error','Could not load your schedule.');return;}
+  if(!s.set){setWidget('scheduleBody','empty','No pickup schedule set yet. <a class="dash-link" href="/pages/settings.html">Set your pickup schedule</a>.');return;}
+  var when=s.daysAway===0?'today':(s.daysAway===1?'tomorrow':'in '+s.daysAway+' days');
+  setWidget('scheduleBody','ok','<div class="schedule-line">Next pickup: <b>'+s.weekday+'</b> ('+when+')</div><div class="widget-note">'+s.nextDate+(s.time?' at '+s.time:'')+'</div>');
+}
+
+var _healthCache=null,_wsOk=false;
+function renderHealth(h){
+  if(!h){setWidget('healthBody','error','Could not load device health.');return;}
+  _healthCache=h;
+  var rows=[];
+  rows.push('<div class="health-item"><span class="dot '+(h.online?'ok pulse':'off')+'"></span><span>Device '+(h.online?'online':'offline')+'</span></div>');
+  rows.push('<div class="health-item"><span class="dot warn"></span><span id="healthLastData"><b>Last data:</b> '+relTime(h.lastSeen)+'</span></div>');
+  rows.push('<div class="health-item"><span class="dot '+(h.lidStatus==='open'?'ok':'off')+'"></span><span>Lid: '+((h.lidStatus==='open')?'open':'closed')+'</span></div>');
+  rows.push('<div class="health-item"><span class="dot '+( _wsOk?'ok':'off')+'"></span><span id="healthWs">Socket: '+(_wsOk?'connected':'connecting…')+'</span></div>');
+  setWidget('healthBody','ok',rows.join(''));
+}
+function updateWsHealth(){
+  var wsEl=$('healthWs');if(wsEl)wsEl.textContent='Socket: '+(_wsOk?'connected':'disconnected');
+}
+// 1s client-side tick so "Last data: 12s ago" stays current between refreshes
+setInterval(function(){
+  var el=$('healthLastData');
+  if(el&&_healthCache)el.innerHTML='<b>Last data:</b> '+relTime(_healthCache.lastSeen);
+  drawDataStatus();
+  updateWsHealth();
+},1000);
+
+// ============ WEEKLY COMPARISON ============
+var _weeklyChart=null;
+function weeklyTakeaway(w){
+  var d=w.changePct||{};
+  var opts=[];
+  if(d.wet!==null&&d.wet!==0)opts.push({t:(d.wet>0?'Wet waste up ':'Wet waste down ')+Math.abs(d.wet)+'% vs last week',mag:Math.abs(d.wet)});
+  if(d.dry!==null&&d.dry!==0)opts.push({t:(d.dry>0?'Dry waste up ':'Dry waste down ')+Math.abs(d.dry)+'% vs last week',mag:Math.abs(d.dry)});
+  if(!opts.length)return 'Fill levels are stable vs last week';
+  opts.sort(function(a,b){return b.mag-a.mag;});
+  return opts[0].t;
+}
+function drawWeekly(w){
+  var canvas=$('weeklyChart');if(!canvas||typeof Chart==='undefined')return;
+  if(_weeklyChart){ChartTheme.untrack(_weeklyChart);_weeklyChart.destroy();_weeklyChart=null;}
+  var tw=w.thisWeek||{},lw=w.lastWeek||{};
+  var ct=ChartTheme.colors();
+  _weeklyChart=new Chart(canvas,{
+    type:'bar',
+    data:{labels:['Last week','This week'],datasets:[
+      {label:'Wet',data:[lw.wet===undefined?null:lw.wet,tw.wet===undefined?null:tw.wet],backgroundColor:'rgba(33,150,243,0.75)',borderColor:'#2196F3',borderWidth:1,borderRadius:6},
+      {label:'Dry',data:[lw.dry===undefined?null:lw.dry,tw.dry===undefined?null:tw.dry],backgroundColor:'rgba(76,175,80,0.75)',borderColor:'#4CAF50',borderWidth:1,borderRadius:6}
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{color:ct.legend,boxWidth:10,boxHeight:10,padding:10,font:{size:10}}}},
+      scales:{
+        y:{beginAtZero:true,max:100,ticks:{color:ct.tick,stepSize:25,callback:function(v){return v+'%';},font:{size:9}},grid:{color:ct.grid}},
+        x:{ticks:{color:ct.tick,font:{size:10}},grid:{display:false}}
+      }
+    }
+  });
+  ChartTheme.track(_weeklyChart);
+}
+function renderWeekly(w){
+  var box=$('weeklyBox'),note=$('weeklyTakeaway');
+  if(!box||!note)return;
+  if(!w){note.textContent='Could not load weekly comparison.';box.style.display='none';return;}
+  if(!w.hasEnoughData){
+    note.textContent='Not enough data yet — keep collecting readings.';
+    box.style.display='none';
+    if(_weeklyChart){ChartTheme.untrack(_weeklyChart);_weeklyChart.destroy();_weeklyChart=null;}
+    return;
+  }
+  box.style.display='';
+  drawWeekly(w);
+  note.textContent=weeklyTakeaway(w);
+}
+
+// ============ LOAD SUMMARY (single endpoint: stats + predictions + gamification + hourly + widgets) ============
+function renderBins(bins){
+  if(!bins)return;
+  if(bins.wetBin)updateBinUI('wetBin',bins.wetBin);
+  if(bins.dryBin)updateBinUI('dryBin',bins.dryBin);
+  renderHero(bins);
+}
+
+function renderStats(data, preds){
+  animateCount($('totalReadings'),data.totalReadings||0);
+  var aw=$('avgWet'),ad=$('avgDry');
+  if(data.hasAvgWet24h){animateCount(aw,Math.round(data.avgWet24h),'%');}
+  else{aw.textContent='--';}
+  if(data.hasAvgDry24h){animateCount(ad,Math.round(data.avgDry24h),'%');}
+  else{ad.textContent='--';}
+  animateCount($('co2Saved'),data.co2Saved||0,' kg');
+  var tR=$('trendReadings'),tW=$('trendWet'),tD=$('trendDry'),tC=$('trendCo2');
+  if(tR)tR.textContent=data.deviceReady?(data.totalReadings+' total'):'Waiting for device data…';
+  if(tW)tW.textContent=data.hasAvgWet24h?'last 24h':'No data in last 24h';
+  if(tD)tD.textContent=data.hasAvgDry24h?'last 24h':'No data in last 24h';
+  if(tC)tC.textContent=(data.totalCollections||0)+' collections';
+  renderBins(data.bins||{});
+  renderDataStatus(data);
+}
+
+// ============ DATA STATUS BAR (live / offline / waiting / test-data) ============
+var _statusStats=null,_statusHealth=null;
+function renderDataStatus(stats,h){
+  _statusStats=stats;_statusHealth=h;
+  drawDataStatus();
+}
+function drawDataStatus(){
+  var bar=$('dataStatusBar');if(!bar)return;
+  var st=_statusStats,h=_statusHealth,txt=$('dataStatusText');
+  if(!st||!txt)return;
+  if(!st.deviceReady){
+    txt.textContent=st.testTotalReadings>0
+      ?'🧪 No sensor data yet — '+st.testTotalReadings+' test reading(s) recorded (excluded from stats).'
+      :'📡 Waiting for the waste sensor — no readings yet.';
+  }else if(h&&h.online){
+    txt.textContent='🟢 Live — last reading '+relTime(st.deviceLastReading)+'.';
+  }else{
+    txt.textContent='🔴 Device offline — showing last data from '+relTime(st.deviceLastReading)+'.';
+  }
+  var grid=$('statsGrid');
+  if(grid)grid.classList.toggle('is-stale',!!(st.deviceReady&&(!h||!h.online)));
+  var tc=$('testChip');
+  if(tc){tc.hidden=!(st.testTotalReadings>0);tc.textContent='🧪 TEST data: '+st.testTotalReadings;}
+}
+
+function renderGamification(data){
+  animateCount($('ecoScore'),data.ecoScore||0);
+  var st=$('streakCount');if(st)st.textContent=data.streakDays||0;
+}
+
+function renderNotificationCount(n){
+  var el=$('notifCount');
+  el.textContent=n||0;
+  el.style.display=(n>0)?'flex':'none';
+}
+
+function loadSummary(minimal){
+  fetch('/api/dashboard/summary',{credentials:'include'}).then(function(r){return r.json();}).then(function(d){
+    if(!minimal){
+      renderStats(d.stats||{},d.predictions||{});
+      renderGamification(d.gamification||{});
+      renderNotificationCount(d.unread||0);
+    }else{
+      renderBins((d.stats||{}).bins||{});
+    }
+    renderTrendChart(d.hourly||[]);
+    renderWeekly(d.weekly);
+    renderToday(d.today);
+    renderHealth(d.health);
+    renderSchedule(d.schedule);
+    renderGoal(d.goal);
+    renderAlertBanner(d.anomalies||[],(d.stats||{}).bins||{});
+    renderDataStatus(d.stats||{},d.health);
+  }).catch(function(){});
+}
+
+// ============ TREND CHART (Chart.js) ============
+var _trendChart=null;
+function renderTrendChart(hourly){
+  var canvas=$('trendChart');
+  if(!canvas||typeof Chart==='undefined')return;
+  var emptyEl=$('trendEmpty');
+  if(!hourly||!hourly.length){
+    if(_trendChart){ChartTheme.untrack(_trendChart);_trendChart.destroy();_trendChart=null;}
+    if(emptyEl)emptyEl.style.display='flex';
+    return;
+  }
+  if(emptyEl)emptyEl.style.display='none';
+  var H=canvas.parentElement.clientHeight||200;
+  var ctx=canvas.getContext('2d');
+  var wetGrad=ctx.createLinearGradient(0,0,0,H);
+  wetGrad.addColorStop(0,'rgba(33,150,243,0.12)');wetGrad.addColorStop(1,'rgba(33,150,243,0.01)');
+  var dryGrad=ctx.createLinearGradient(0,0,0,H);
+  dryGrad.addColorStop(0,'rgba(76,175,80,0.12)');dryGrad.addColorStop(1,'rgba(76,175,80,0.01)');
+  var seen={},hours=[];
+  hourly.forEach(function(d){if(!seen[d.hour]){seen[d.hour]=1;hours.push(d.hour);}});
+  hours.sort();
+  var wetMap={},dryMap={};
+  hourly.forEach(function(d){if(d.bin_type==='wetBin')wetMap[d.hour]=d.avg_level;else dryMap[d.hour]=d.avg_level;});
+  var labels=hours.map(function(h){return h.split(' ')[1]||h;});
+  var wetData=hours.map(function(h){return wetMap[h]===undefined?null:wetMap[h];});
+  var dryData=hours.map(function(h){return dryMap[h]===undefined?null:dryMap[h];});
+  if(_trendChart){ChartTheme.untrack(_trendChart);_trendChart.destroy();_trendChart=null;}
+  var ct=ChartTheme.colors();
+  _trendChart=new Chart(canvas,{
+    type:'line',
+    data:{labels:labels,datasets:[
+      {label:'Wet',data:wetData,borderColor:'rgba(33,150,243,1)',backgroundColor:wetGrad,fill:true,tension:0.3,borderWidth:2,pointRadius:0,spanGaps:true},
+      {label:'Dry',data:dryData,borderColor:'rgba(76,175,80,1)',backgroundColor:dryGrad,fill:true,tension:0.3,borderWidth:2,pointRadius:0,spanGaps:true}
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{color:ct.legend,boxWidth:12,boxHeight:12,padding:12,font:{size:11}}}},
+      scales:{
+        y:{beginAtZero:true,max:100,ticks:{color:ct.tick,stepSize:25,callback:function(v){return v+'%';},font:{size:10}},grid:{color:ct.grid}},
+        x:{ticks:{color:ct.tick,maxTicksLimit:8,font:{size:10}},grid:{display:false}}
+      }
+    }
+  });
+  ChartTheme.track(_trendChart);
+}
+
+// ============ QUICK ACTIONS ============
+function openModal(id){$(id).classList.add('show');}
+function closeModal(id){$(id).classList.remove('show');}
+document.querySelectorAll('.modal').forEach(function(m){
+  m.addEventListener('click',function(e){if(e.target===m)closeModal(m.id);});
+});
+function qaSimulate(){openModal('simulateModal');}
+function qaRunSimulate(){
+  var wet=parseInt($('simWet').value,10)||0;
+  var dry=parseInt($('simDry').value,10)||0;
+  wet=Math.max(0,Math.min(100,wet));dry=Math.max(0,Math.min(100,dry));
+  fetch('/api/sensor-data',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',
+    body:JSON.stringify({wetLevel:wet,dryLevel:dry,source:'test'})})
+    .then(function(r){return r.json();})
+    .then(function(j){
+      closeModal('simulateModal');
+      if(j&&j.status==='ok')showToast('🧪 Test reading sent (wet '+wet+'%, dry '+dry+'%) — labelled TEST, excluded from stats','success');
+      else showToast('Failed to send test reading','error');
+    })
+    .catch(function(){closeModal('simulateModal');showToast('Failed to send test reading','error');});
+}
+function qaCollect(){openModal('collectModal');}
+function qaRunCollect(){
+  var sel=document.querySelector('input[name="collectBin"]:checked');
+  if(!sel){showToast('Select at least one bin','error');return;}
+  var bins=sel.value==='both'?['wetBin','dryBin']:[sel.value];
+  if(!confirm(bins.length===2?'Mark BOTH bins as collected? This resets their levels and awards eco points.':'Mark the selected bin as collected? This resets its level and awards eco points.'))return;
+  var done=0,total=bins.length,hasErr=false;
+  bins.forEach(function(b){
+    fetch('/api/bins/'+b+'/collect',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include'})
+      .then(function(r){return r.json();})
+      .then(function(j){done++;
+        if(j&&j.error)hasErr=true;
+        if(done===total){closeModal('collectModal');
+          showToast(hasErr?'Failed to mark bin as collected':'🚚 Bin(s) marked as collected — eco points awarded',hasErr?'error':'success');}
+      })
+      .catch(function(){done++;hasErr=true;if(done===total){closeModal('collectModal');showToast('Failed to mark bin as collected','error');}});
+  });
+}
+function qaTelegram(){
+  fetch('/api/telegram/test',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:'{}'})
+    .then(function(r){return r.json();})
+    .then(function(j){
+      if(j&&j.status==='ok')showToast('📨 Test Telegram message sent','success');
+      else showToast('Telegram not configured — add a bot token + chat ID first','warning');
+    })
+    .catch(function(){showToast('Telegram test failed','error');});
+}
+
+// ============ WEBSOCKET ============
+var socket=io({transports:['polling','websocket']});
+socket.on('connect',function(){_wsOk=true;updateWsHealth();showToast('🟢 Connected to server','success');addTickerEvent('🟢 WebSocket connected');loadSummary(true);});
+socket.on('disconnect',function(){_wsOk=false;updateWsHealth();showToast('🔴 Disconnected from server','error');});
+socket.on('bin_update',function(data){
+  var wl=data.wetBin?(data.wetBin.level||0):0,dl=data.dryBin?(data.dryBin.level||0):0;
+  renderBins({wetBin:data.wetBin,dryBin:data.dryBin});
+  addTickerEvent('Wet: '+wl+'% | Dry: '+dl+'%');
+  if(wl>=85)showToast('⚠️ Wet bin at '+wl+'%! Please empty soon.','warning');
+  if(dl>=85)showToast('⚠️ Dry bin at '+dl+'%! Please empty soon.','warning');
+  debounceFullRefresh(); // recompute stat cards / trend / health after a real reading
+});
+socket.on('test_reading',function(data){
+  showToast('🧪 Test reading recorded — labelled TEST, excluded from stats','info');
+  addTickerEvent('🧪 Test reading recorded');
+  debounceFullRefresh(); // refresh so the TEST chip/data status stay live
+});
+var _fullRefreshTimer=null;
+function debounceFullRefresh(){
+  if(_fullRefreshTimer)clearTimeout(_fullRefreshTimer);
+  _fullRefreshTimer=setTimeout(function(){_fullRefreshTimer=null;loadSummary();},400);
+}
+socket.on('presence_update',function(data){
+  if(data.detected){showToast('👤 Person detected at '+data.distance.toFixed(1)+' cm','info');addTickerEvent('👤 Person detected');}
+});
+socket.on('lid_update',function(data){
+  var wetLid=$('wetLid'),dryLid=$('dryLid');
+  if(data.status==='open'){wetLid.classList.add('open');dryLid.classList.add('open');addTickerEvent('🔓 Lid opened');}
+  else{wetLid.classList.remove('open');dryLid.classList.remove('open');addTickerEvent('🔒 Lid closed');}
+  if(_healthCache){_healthCache.lidStatus=data.status;renderHealth(_healthCache);}
+});
+socket.on('confetti',function(){fireConfetti();showToast('🎉 Bins have been reset!','success');});
+socket.on('notification_new',function(ntf){
+  var el=$('notifCount');
+  renderNotificationCount((parseInt(el.textContent,10)||0)+1);
+  if(ntf&&ntf.message)showToast('🔔 '+ntf.message,'info');
+});
+socket.on('badge_unlocked',function(evt){
+  if(evt&&evt.name){
+    showToast('🏅 Badge unlocked: '+evt.name,'success');
+    addTickerEvent('🏅 '+evt.name+' badge unlocked');
+  }
+  loadSummary();
+});
+
+// Apply saved theme (drives the shared themes.css tokens)
+var savedTheme=localStorage.getItem('theme');
+if(savedTheme){try{savedTheme=JSON.parse(savedTheme);}catch(e){}document.body.className='theme-'+savedTheme;}
+
+// ============ INIT ============
+loadSummary();
+setInterval(loadSummary,30000);
+window.addEventListener('resize',function(){if(_trendChart)_trendChart.resize();if(_weeklyChart)_weeklyChart.resize();});
+
+// Online/offline
+window.addEventListener('online',function(){showToast('🌐 Back online','success');});
+window.addEventListener('offline',function(){showToast('📡 You are offline','error');});
+
+// ============ TOPBAR AVATAR (image or initial-letter fallback) ============
+var topAvatarName='User';
+function renderTopAvatar(u){
+  var el=$('topAvatar');
+  if(!el)return;
+  var name=(u&&(u.fullName||u.username))||topAvatarName;
+  if(name)topAvatarName=name;
+  var url=(u&&u.avatarUrl)||'';
+  if(url){
+    var sep=url.indexOf('?')>-1?'&t=':'?t=';
+    el.innerHTML='<img src="'+url+sep+Date.now()+'" alt="'+name.charAt(0).toUpperCase()+'">';
+  }else{
+    el.textContent=name.charAt(0).toUpperCase();
+  }
+}
+fetch('/api/auth/me',{credentials:'include'})
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.authenticated&&d.user)renderTopAvatar(d.user);
+  })
+  .catch(function(){});
+window.addEventListener('avatar-updated',function(e){
+  if(e&&e.detail&&e.detail.avatarUrl)renderTopAvatar({avatarUrl:e.detail.avatarUrl});
+});
+</script>
+<script type="module" src="/frontend/shared/js/theme-switcher.js"></script>
+<script src="/frontend/shared/js/emailjs-config.js"></script>
+<script src="/frontend/shared/js/chat-widget.js"></script>
+</body>
+</html>

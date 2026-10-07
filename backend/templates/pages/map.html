@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" sizes="32x32" href="/frontend/assets/images/favicon-32x32.png?v=1">
+<link rel="icon" type="image/png" sizes="16x16" href="/frontend/assets/images/favicon-16x16.png?v=1">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo.png?v=1" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo-dark.png?v=1" media="(prefers-color-scheme: dark)">
+<link rel="shortcut icon" href="/frontend/assets/images/favicon.ico?v=1">
+<link rel="apple-touch-icon" sizes="180x180" href="/frontend/assets/images/apple-touch-icon.png?v=1">
+<meta name="theme-color" content="#091020">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Map View - Smart Waste Segregator</title>
+<link rel="stylesheet" href="/frontend/shared/css/themes.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 100px 20px 40px 20px;
+}
+
+.map-container {
+  max-width: 100%;
+  margin: 0 auto;
+  position: relative;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+}
+
+.map-wrap {
+  position: relative;
+}
+
+#map {
+  width: 100%;
+  height: calc(100vh - 220px);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.map-empty {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(10, 14, 26, 0.9);
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  padding: 24px 32px;
+  text-align: center;
+  color: #e8edf7;
+  z-index: 500;
+  max-width: 360px;
+}
+
+.map-empty h3 {
+  color: #00d4ff;
+  margin: 10px 0 8px;
+}
+
+.map-empty p {
+  opacity: 0.75;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.map-controls {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-btn {
+  padding: 10px 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+  background: rgba(0, 212, 255, 0.2);
+  border-color: #00d4ff;
+}
+
+.legend {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 15px;
+  border-radius: 10px;
+  z-index: 1000;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.legend h4 {
+  color: #111;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+  color: #111;
+  font-size: 0.85rem;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.popup-content {
+  color: #111;
+}
+
+.popup-content h3 {
+  margin-bottom: 10px;
+  color: #00d4ff;
+}
+
+.popup-address {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  margin-bottom: 10px;
+}
+
+.popup-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.popup-stat {
+  background: #f5f5f5;
+  padding: 8px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.popup-stat .value {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #00d4ff;
+}
+
+.popup-stat .label {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.popup-links {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.view-details-btn {
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(135deg, #00d4ff, #00ff99);
+  border: none;
+  border-radius: 8px;
+  color: #111;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 0.85rem;
+}
+
+.view-details-btn.wet {
+  background: linear-gradient(135deg, #3498db, #5dade2);
+  color: #fff;
+}
+
+.view-details-btn.dry {
+  background: linear-gradient(135deg, #2ecc71, #58d68d);
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 80px 20px 40px 20px;
+  }
+
+  #map {
+    height: calc(100vh - 180px);
+  }
+
+  .legend {
+    bottom: 10px;
+    right: 10px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Sidebar */
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none;}
+.sidebar{position:fixed;left:0;top:0;height:100%;width:260px;background:var(--bg-card);backdrop-filter:blur(20px);border-right:1px solid var(--border-color);padding:20px 12px;z-index:1000;transform:translateX(-100%);transition:transform 0.35s cubic-bezier(.4,0,.2,1);overflow-y:auto;}
+.sidebar.active{transform:translateX(0);}
+.close-btn{position:absolute;top:18px;right:14px;background:none;border:none;color:var(--text-secondary);font-size:1.5rem;cursor:pointer;transition:color 0.2s;}
+.close-btn:hover{color:#ff6b6b;}
+.nav-links{list-style:none;}
+.nav-links li{margin-bottom:1px;}
+.nav-links a{display:flex;align-items:center;gap:10px;padding:10px 14px;color:var(--text-secondary);text-decoration:none;border-radius:10px;transition:all 0.2s;font-size:0.88rem;}
+.nav-links a:hover{background:var(--bg-secondary);color:var(--text-primary);}
+.nav-links a.active{background:linear-gradient(135deg,rgba(0,212,255,0.12),rgba(0,255,136,0.06));color:var(--accent-primary);font-weight:500;border-left:3px solid var(--accent-primary);}
+.nav-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:8px;flex-shrink:0;}
+.hamburger{position:fixed;top:18px;left:18px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-primary);font-size:1.3rem;padding:7px 11px;border-radius:8px;cursor:pointer;z-index:999;backdrop-filter:blur(10px);transition:background 0.2s;}
+.hamburger:hover{background:var(--bg-secondary);}
+</style>
+</head>
+<body>
+{% include '_sidebar.html' %}
+<div class="map-container">
+  <h1>🗺️ Bin Locations Map</h1>
+
+  <div class="map-controls">
+    <span style="font-weight: 600;">Filter:</span>
+    <button class="filter-btn active" onclick="filterMap('all', this)">All Bins</button>
+    <button class="filter-btn" onclick="filterMap('full', this)">🔴 Full (&gt;80%)</button>
+    <button class="filter-btn" onclick="filterMap('warning', this)">🟡 Warning (60-80%)</button>
+    <button class="filter-btn" onclick="filterMap('ok', this)">🟢 OK (&lt;60%)</button>
+  </div>
+
+  <div class="map-wrap">
+    <div id="map"></div>
+
+    <div class="map-empty" id="mapEmpty" style="display:none;">
+      <div style="font-size: 2.5rem;">📍</div>
+      <h3>No locations plotted yet</h3>
+      <p>Add a location with coordinates from the Locations page and it will appear here.</p>
+    </div>
+
+    <div class="legend">
+      <h4>Status Legend</h4>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #00ff99;"></div>
+        <span>OK (&lt; 60%)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #ffaa00;"></div>
+        <span>Warning (60-80%)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #ff4444;"></div>
+        <span>Full (&gt; 80%)</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var map = null;
+var binLayer = null;
+var locations = [];
+var liveWet = 0;
+var liveDry = 0;
+var currentFilter = 'all';
+
+window.esc = function(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+};
+
+window.avgLevel = function() {
+  return (liveWet + liveDry) / 2;
+};
+
+window.markerColor = function() {
+  var avg = avgLevel();
+  return avg >= 80 ? '#ff4444' : (avg >= 60 ? '#ffaa00' : '#00ff99');
+};
+
+window.markerFor = function(loc) {
+  var color = markerColor();
+  var icon = L.divIcon({
+    className: 'custom-marker',
+    html: '<div style="' +
+      'width: 42px; height: 42px; background: ' + color + ';' +
+      'border-radius: 50%; border: 3px solid white;' +
+      'box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);' +
+      'display: flex; align-items: center; justify-content: center;' +
+      'font-size: 1.2rem;">🗑️</div>',
+    iconSize: [42, 42],
+    iconAnchor: [21, 21]
+  });
+
+  var marker = L.marker([loc.lat, loc.lng], { icon: icon }).addTo(binLayer);
+
+  var popupContent =
+    '<div class="popup-content">' +
+      '<h3>' + esc(loc.icon || '🏢') + ' ' + esc(loc.name) + '</h3>' +
+      (loc.address ? '<div class="popup-address">' + esc(loc.address) + '</div>' : '') +
+      '<div class="popup-stats">' +
+        '<div class="popup-stat"><div class="value">' + Math.round(liveWet) + '%</div><div class="label">💧 Wet</div></div>' +
+        '<div class="popup-stat"><div class="value">' + Math.round(liveDry) + '%</div><div class="label">♻️ Dry</div></div>' +
+      '</div>' +
+      '<div class="popup-links">' +
+        '<button class="view-details-btn wet" onclick="window.location.href=\'/pages/wet-bin.html\'">💧 Wet Bin</button>' +
+        '<button class="view-details-btn dry" onclick="window.location.href=\'/pages/dry-bin.html\'">♻️ Dry Bin</button>' +
+      '</div>' +
+    '</div>';
+
+  marker.bindPopup(popupContent);
+  return marker;
+};
+
+window.renderBins = function() {
+  if (!binLayer) return;
+  binLayer.clearLayers();
+  var mapped = locations.filter(function(l) { return l.lat != null && l.lng != null; });
+  var empty = document.getElementById('mapEmpty');
+  if (empty) empty.style.display = mapped.length ? 'none' : 'block';
+  mapped.forEach(markerFor);
+  applyFilter();
+};
+
+window.applyFilter = function() {
+  if (!binLayer) return;
+  var avg = avgLevel();
+  binLayer.eachLayer(function(marker) {
+    var show = true;
+    if (currentFilter === 'full' && avg < 80) show = false;
+    if (currentFilter === 'warning' && (avg < 60 || avg >= 80)) show = false;
+    if (currentFilter === 'ok' && avg >= 60) show = false;
+    if (show) marker.addTo(binLayer); else binLayer.removeLayer(marker);
+  });
+};
+
+window.filterMap = function(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  applyFilter();
+};
+
+window.loadMapData = function() {
+  fetch('/api/locations', { credentials: 'include' })
+    .then(function(r) { return r.ok ? r.json() : []; })
+    .then(function(list) { locations = list || []; renderBins(); })
+    .catch(function(e) { console.error('Map locations error:', e); });
+};
+
+window.refreshLevels = function() {
+  fetch('/api/bins')
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data || !data.bins) return;
+      var w = data.bins.wetBin || {}, d = data.bins.dryBin || {};
+      liveWet = w.level != null ? w.level : liveWet;
+      liveDry = d.level != null ? d.level : liveDry;
+      renderBins();
+    })
+    .catch(function(e) { console.error('Map levels error:', e); });
+};
+
+(function init() {
+  if (typeof L !== 'undefined') {
+    map = L.map('map').setView([28.6139, 77.2090], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19
+    }).addTo(map);
+    binLayer = L.layerGroup().addTo(map);
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        var lat = position.coords.latitude, lng = position.coords.longitude;
+        L.marker([lat, lng], {
+          icon: L.divIcon({
+            className: 'user-marker',
+            html: '<div style="width: 20px; height: 20px; background: #0078ff; border-radius: 50%; border: 3px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3);"></div>',
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+          })
+        }).addTo(map).bindPopup('Your Location');
+        map.setView([lat, lng], 15);
+      });
+    }
+
+    loadMapData();
+    refreshLevels();
+    setInterval(function() { loadMapData(); refreshLevels(); }, 30000);
+  }
+})();
+</script>
+
+<script type="module" src="/frontend/shared/js/theme-switcher.js"></script>
+</body>
+</html>

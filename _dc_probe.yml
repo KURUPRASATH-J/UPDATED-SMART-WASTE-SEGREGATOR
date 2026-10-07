@@ -1,0 +1,32 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smart-waste-backend
+    ports:
+      - "5000:5000"
+    environment:
+      # Interpolated from the repo-root .env if present; safe placeholders otherwise.
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:5000}
+      - DEBUG=${DEBUG:-false}
+      - HOST=0.0.0.0
+      - PORT=5000
+      - DB_URL=/data/waste.db
+      - DEVICE_TOKEN=${DEVICE_TOKEN:-}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-}
+    volumes:
+      # Persist SQLite (and its WAL) across container restarts/recreates.
+      - waste_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/api/stats')"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  waste_data:

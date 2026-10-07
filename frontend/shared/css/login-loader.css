@@ -1,0 +1,378 @@
+/* ==========================================================================
+   Smart Waste Segregator — full-screen loading overlay
+   Component: frontend/shared/css/login-loader.css + ../js/login-loader.js
+   Geometry/colour tokens measured from assets/images/loading-animation.png
+   (1672x941 reference). All motion uses transform/opacity only.
+   ========================================================================== */
+
+.swl-overlay {
+  --swl-green: #46e39a;
+  --swl-green-2: #7cf5b0;
+  --swl-cyan: #34f9de;
+  --swl-tip: #f9fffb;
+  --swl-track: rgba(24, 74, 76, 0.38);
+  --swl-ink: #ffffff;
+  --swl-ink-dim: #dee0e8;
+  --swl-ink-soft: #f4f2f5;
+  --swl-pct: #c9c9cb;
+  --swl-bar-track: rgba(255, 255, 255, 0.10);
+  --swl-accent-a: #2ed69d;
+  --swl-accent-b: #5ef38a;
+  --swl-bg-0: #01060f;
+  --swl-bg-1: #050e2b;
+  --swl-ring-size: clamp(168px, min(21.5vw, 40vmin), 380px);
+  --swl-bar-w: min(560px, 78vw);
+
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  /* margin:auto on .swl-stage centres safely AND stays reachable when the
+     content is taller than the viewport (plain align-items:center would clip
+     the top half). */
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px 0;
+  background: var(--swl-bg-0);
+  color: var(--swl-ink);
+  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+  opacity: 0;
+  transition: opacity 0.32s ease;
+  -webkit-font-smoothing: antialiased;
+}
+.swl-overlay.swl-in { opacity: 1; }
+.swl-overlay.swl-out { opacity: 0; pointer-events: none; }
+
+/* ---------- background: smoky navy + vignette ---------- */
+.swl-bg,
+.swl-smoke,
+.swl-vignette { position: absolute; inset: 0; pointer-events: none; }
+
+.swl-bg {
+  overflow: hidden; /* clip the ::after bleed so it cannot inflate the scroll box */
+  background:
+    radial-gradient(110% 80% at 50% 32%, rgba(13, 36, 40, 0.20) 0%, rgba(4, 11, 33, 0.14) 45%, rgba(1, 5, 12, 0) 72%),
+    radial-gradient(70% 55% at 8% 10%, rgba(18, 48, 56, 0.62) 0%, rgba(1, 6, 15, 0) 65%),
+    radial-gradient(80% 60% at 12% 78%, rgba(3, 15, 32, 0.85) 0%, rgba(1, 6, 15, 0) 70%),
+    linear-gradient(168deg, #040b21 0%, #010510 58%, #000105 100%);
+}
+
+/* Blurred crop of the reference still — authentic smoky texture, 2.9 KB. */
+.swl-bg::after {
+  content: "";
+  position: absolute;
+  inset: -6%;
+  background-image: url("/frontend/assets/images/loader-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.3;
+  mix-blend-mode: screen;
+}
+
+.swl-smoke { overflow: hidden; }
+.swl-smoke i {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.5;
+  will-change: transform, opacity;
+}
+.swl-smoke i:nth-child(1) {
+  width: 46vmax; height: 46vmax; left: -12vmax; top: 8vmax;
+  background: radial-gradient(circle, rgba(46, 214, 157, 0.20), rgba(46, 214, 157, 0) 70%);
+  animation: swl-drift-a 19s ease-in-out infinite;
+}
+.swl-smoke i:nth-child(2) {
+  width: 40vmax; height: 40vmax; right: -10vmax; top: 42vmax;
+  background: radial-gradient(circle, rgba(52, 249, 222, 0.16), rgba(52, 249, 222, 0) 70%);
+  animation: swl-drift-b 23s ease-in-out infinite;
+}
+.swl-smoke i:nth-child(3) {
+  width: 34vmax; height: 34vmax; left: 28vmax; top: -8vmax;
+  background: radial-gradient(circle, rgba(124, 245, 176, 0.12), rgba(124, 245, 176, 0) 70%);
+  animation: swl-drift-a 27s ease-in-out infinite reverse;
+}
+@keyframes swl-drift-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.42; }
+  50%      { transform: translate3d(6vmax, -3vmax, 0) scale(1.12); opacity: 0.62; }
+}
+@keyframes swl-drift-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); opacity: 0.38; }
+  50%      { transform: translate3d(-5vmax, 3vmax, 0) scale(0.94); opacity: 0.58; }
+}
+
+.swl-vignette {
+  background: radial-gradient(115% 88% at 50% 36%, rgba(0, 0, 0, 0) 44%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+/* ---------- floating leaves + glowing dots ---------- */
+.swl-particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.swl-p {
+  position: absolute;
+  bottom: -8vh;
+  will-change: transform, opacity;
+  opacity: 0;
+}
+.swl-p--dot {
+  border-radius: 50%;
+  background: var(--swl-c, #65de72);
+  box-shadow: 0 0 10px 2px var(--swl-c, #65de72);
+}
+.swl-p--leaf {
+  width: 26px;
+  height: 26px;
+  background: var(--swl-c, #338436);
+  border-radius: 68% 8% 68% 8%;
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 0 7px rgba(70, 227, 154, 0.45));
+}
+@keyframes swl-float {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.7); opacity: 0; }
+  12%  { opacity: var(--swl-o, 0.85); }
+  85%  { opacity: var(--swl-o, 0.85); }
+  100% { transform: translate3d(var(--swl-dx, 4vw), -112vh, 0) rotate(var(--swl-rot, 220deg)) scale(1); opacity: 0; }
+}
+
+/* ---------- stage layout ---------- */
+.swl-stage {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: auto; /* safe centring: never clips when the content is taller */
+  padding: 2vh 20px;
+  text-align: center;
+}
+
+/* ---------- ring ---------- */
+.swl-ringwrap {
+  position: relative;
+  width: var(--swl-ring-size);
+  height: var(--swl-ring-size);
+  flex: 0 0 auto;
+}
+.swl-ring { width: 100%; height: 100%; display: block; overflow: visible; }
+
+/* rotate the whole dial so progress starts at 12 o'clock */
+.swl-dial { transform-origin: 100px 100px; transform: rotate(-90deg); }
+
+.swl-track {
+  fill: none;
+  stroke: var(--swl-track);
+  stroke-width: 12;
+}
+.swl-arc {
+  fill: none;
+  stroke: url(#swlArcGrad);
+  stroke-width: 12;
+  stroke-linecap: round;
+  filter: url(#swlGlow);
+  transition: stroke-dashoffset 0.42s cubic-bezier(0.32, 0.72, 0.3, 1);
+}
+.swl-tipglow { fill: url(#swlTipGrad); filter: url(#swlTipBlur); }
+.swl-tip { fill: var(--swl-tip); }
+
+/* centre recycle mark */
+.swl-glyph { transform-origin: 100px 100px; animation: swl-spin 9s linear infinite; }
+.swl-arrow {
+  fill: none;
+  stroke: url(#swlGlyphGrad);
+  stroke-width: 11;
+  stroke-linecap: round;
+}
+.swl-head { fill: url(#swlGlyphGrad); }
+.swl-leaf { fill: url(#swlLeafGrad); }
+.swl-leafrib { fill: none; stroke: rgba(255, 255, 255, 0.55); stroke-width: 1.6; stroke-linecap: round; }
+.swl-halo { animation: swl-pulse 2.6s ease-in-out infinite; transform-origin: 100px 100px; }
+
+@keyframes swl-spin { to { transform: rotate(360deg); } }
+@keyframes swl-pulse {
+  0%, 100% { opacity: 0.34; transform: scale(0.97); }
+  50%      { opacity: 0.72; transform: scale(1.06); }
+}
+
+/* ---------- copy ---------- */
+.swl-title {
+  margin: clamp(14px, 3.2vh, 30px) 0 0;
+  font-size: clamp(1.55rem, 5.1vw, 3.05rem);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  color: var(--swl-ink);
+  text-shadow: 0 2px 26px rgba(70, 227, 154, 0.22);
+}
+.swl-title span {
+  background: linear-gradient(96deg, var(--swl-accent-a), var(--swl-green-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.swl-tag {
+  margin: clamp(6px, 1.4vh, 12px) 0 0;
+  font-size: clamp(0.78rem, 1.55vw, 1.02rem);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  color: var(--swl-ink-dim);
+}
+
+/* ---------- progress bar ---------- */
+.swl-barrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: clamp(20px, 4.6vh, 46px);
+}
+.swl-bar {
+  position: relative;
+  width: var(--swl-bar-w);
+  height: clamp(9px, 2.6vh, 26px);
+  border-radius: 999px;
+  background: var(--swl-bar-track);
+  overflow: hidden;
+}
+.swl-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--swl-accent-a), var(--swl-accent-b));
+  box-shadow: 0 0 14px rgba(70, 227, 154, 0.55);
+  transition: width 0.42s cubic-bezier(0.32, 0.72, 0.3, 1);
+}
+.swl-pct {
+  min-width: 3.4ch;
+  font-size: clamp(0.85rem, 1.6vw, 1.16rem);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--swl-pct);
+  text-align: left;
+}
+
+/* ---------- status ---------- */
+.swl-status {
+  margin: clamp(14px, 2.8vh, 26px) 0 0;
+  font-size: clamp(0.8rem, 1.5vw, 1.06rem);
+  font-weight: 300;
+  color: var(--swl-ink-soft);
+  min-height: 1.4em;
+}
+
+/* welcome moment: avatar + name built with DOM APIs (never innerHTML) */
+.swl-welcome { display: flex; align-items: center; gap: 10px; justify-content: center; }
+.swl-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  object-fit: cover; flex: 0 0 auto;
+  border: 1.5px solid rgba(70, 227, 154, 0.65);
+  background: rgba(255, 255, 255, 0.06);
+}
+.swl-initial {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.82rem; font-weight: 700; color: #06131f;
+  background: linear-gradient(135deg, var(--swl-accent-a), var(--swl-green-2));
+  flex: 0 0 auto;
+}
+.swl-name { font-weight: 600; color: #fff; }
+
+/* ---------- skip ---------- */
+.swl-skip {
+  margin-top: clamp(10px, 2vh, 18px);
+  padding: 6px 14px;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--swl-ink-dim);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  /* hide: delay the discrete visibility flip until the fade finishes.
+     show (.swl-ready): flip it immediately so the link is never a dead
+     "visible but not yet interactive" frame. */
+  transition: opacity 0.28s ease, transform 0.28s ease, visibility 0s linear 0.28s;
+}
+.swl-skip.swl-ready {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 0.28s ease, transform 0.28s ease, visibility 0s linear 0s;
+}
+.swl-skip:hover { color: #fff; border-color: rgba(70, 227, 154, 0.7); }
+.swl-skip:focus-visible { outline: 2px solid var(--swl-green); outline-offset: 2px; }
+
+/* ---------- admin accent ---------- */
+.swl-overlay.swl-admin {
+  --swl-accent-a: #2bc9f5;
+  --swl-accent-b: #6366f1;
+  --swl-cyan: #38bdf8;
+  --swl-green: #38bdf8;
+  --swl-green-2: #818cf8;
+}
+
+/* ---------- optional video layer (opt-in) ---------- */
+.swl-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.swl-video.swl-video-on { opacity: 0.34; }
+
+/* ---------- optional light variant (not the default) ---------- */
+.swl-overlay[data-variant="light"] {
+  --swl-ink: #0b1a2b;
+  --swl-ink-dim: #46586b;
+  --swl-ink-soft: #16283a;
+  --swl-pct: #46586b;
+  --swl-track: rgba(20, 90, 80, 0.20);
+  --swl-bar-track: rgba(11, 26, 43, 0.12);
+  --swl-title span { background: linear-gradient(96deg, #12a97a, #35c98a); -webkit-background-clip: text; background-clip: text; }
+  background: #eef4f7;
+}
+.swl-overlay[data-variant="light"] .swl-bg {
+  background:
+    radial-gradient(120% 90% at 50% 34%, rgba(190, 232, 220, 0.75) 0%, rgba(233, 243, 247, 0) 70%),
+    linear-gradient(168deg, #f4faf9 0%, #e8f1f5 60%, #dfeaf0 100%);
+}
+.swl-overlay[data-variant="light"] .swl-bg::after { mix-blend-mode: multiply; opacity: 0.22; }
+.swl-overlay[data-variant="light"] .swl-vignette { background: radial-gradient(115% 88% at 50% 36%, rgba(0,0,0,0) 46%, rgba(20,50,70,0.16) 100%); }
+.swl-overlay[data-variant="light"] .swl-title { text-shadow: none; }
+.swl-overlay[data-variant="light"] .swl-skip { color: #46586b; border-color: rgba(11, 26, 43, 0.2); }
+
+/* ---------- responsive ---------- */
+@media (max-width: 520px) {
+  .swl-barrow { flex-direction: column; gap: 10px; }
+  .swl-bar { width: min(420px, 82vw); }
+  .swl-pct { text-align: center; }
+}
+@media (max-height: 560px) and (orientation: landscape) {
+  .swl-overlay { --swl-ring-size: clamp(96px, 24vh, 150px); padding: 10px 0; }
+  .swl-stage { padding: 0 16px; }
+  .swl-title { margin-top: 8px; }
+  .swl-barrow { margin-top: 12px; }
+  .swl-status { margin-top: 8px; }
+  .swl-skip { margin-top: 6px; padding: 4px 12px; }
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .swl-smoke i,
+  .swl-glyph,
+  .swl-halo,
+  .swl-p { animation: none !important; }
+  .swl-p { opacity: 0; }
+  .swl-glyph { transform: none; }
+  .swl-halo { opacity: 0.5; }
+  .swl-arc, .swl-fill { transition-duration: 0.2s; }
+  .swl-overlay, .swl-skip { transition-duration: 0.2s; }
+}

@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env
+.env.*
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+backend/backups/
+backend/uploads/
+.pytest_cache/

@@ -1,0 +1,18 @@
+# Build context exclusions (context = repo root)
+.git
+.gitignore
+**/__pycache__/
+**/*.pyc
+backend/.env
+backend/.env.example
+backend/waste.db
+backend/waste.db-wal
+backend/waste.db-shm
+backend/backups/
+backend/tests/
+hardware/
+*.md
+.dockerignore
+Dockerfile
+docker-compose.yml
+.github/

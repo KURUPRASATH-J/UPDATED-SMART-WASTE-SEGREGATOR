@@ -1,0 +1,92 @@
+[
+  {
+    "id": "greeting",
+    "question": "Hi there!",
+    "answer": "Hello! I'm JUNO AI, your Smart Waste Segregator support assistant. I can answer questions about setting up the system, wet vs dry waste, sensors, reports, badges and more. What would you like to know?",
+    "keywords": ["hi", "hello", "hey", "yo", "greetings", "whats up", "good morning", "good evening"]
+  },
+  {
+    "id": "help_menu",
+    "question": "What can you help me with?",
+    "answer": "I can help with:\n• Setting up the system (first-time install)\n• Wet vs dry waste sorting rules\n• Sensor accuracy & readings\n• Notifications and alerts\n• Reports & data export\n• Points, streaks & badges\n• Multiple bins/locations\nGot a question on any of these? Just ask!",
+    "keywords": ["help", "menu", "options", "commands", "capabilities", "what can you do", "list"]
+  },
+  {
+    "id": "setup",
+    "question": "How do I set up the system for the first time?",
+    "answer": "To set up your Smart Waste Segregator: 1) Create an account on the login page, 2) Connect your ESP32 device to WiFi, 3) Configure the Flask server IP in the ESP32 code, 4) Place sensors in your bins, 5) Start monitoring through the dashboard!",
+    "keywords": ["setup", "set up", "install", "first time", "configure", "config", "getting started", "start", "esp32", "wifi", "device add", "connect device"]
+  },
+  {
+    "id": "waste_types",
+    "question": "What goes in wet vs dry bins?",
+    "answer": "WET waste: food scraps, fruit/vegetable peels, tea bags, coffee grounds, garden waste, cooked food.\nDRY waste: paper, cardboard, plastic bottles, metal cans, glass, textiles, clean packaging materials.",
+    "keywords": ["wet", "dry", "waste", "segregate", "separate", "recycle", "sorting", "categories", "trash", "garbage", "put in"]
+  },
+  {
+    "id": "accuracy",
+    "question": "How accurate are the fill level readings?",
+    "answer": "The system uses ultrasonic sensors with ±2% accuracy. Combined with IR and moisture sensors it provides highly reliable fill level detection, and readings update every 5 seconds for real-time monitoring.",
+    "keywords": ["accurate", "accuracy", "reading", "sensor", "ultrasonic", "precise", "calibrat", "measurement", "level"]
+  },
+  {
+    "id": "notifications",
+    "question": "Can I get notified when bins are full?",
+    "answer": "Yes! Enable browser notifications in Settings. You'll get alerts when bins reach 80% capacity, and you can also configure email notifications in Settings > Notifications.",
+    "keywords": ["notification", "notify", "alert", "full", "remind", "email", "settings notifications", "when full"]
+  },
+  {
+    "id": "password",
+    "question": "How do I reset my password?",
+    "answer": "Click 'Forgot Password' on the login page, enter your email address, and you'll receive a password reset link. Follow the link to create a new password.",
+    "keywords": ["password", "reset", "forgot", "change password", "credentials", "login issue"]
+  },
+  {
+    "id": "impact",
+    "question": "What do the environmental impact numbers mean?",
+    "answer": "Impact metrics show your contribution to sustainability: CO₂ saved (carbon emissions prevented), trees equivalent (trees needed to offset your waste), water saved (conservation through recycling) and energy saved (power conserved through proper waste management).",
+    "keywords": ["impact", "co2", "carbon", "environment", "tree", "water saved", "energy saved", "sustainability", "metric", "saved"]
+  },
+  {
+    "id": "points_badges",
+    "question": "How do I earn points and badges?",
+    "answer": "Earn points by: regular bin emptying (10 pts), maintaining daily streaks (10 pts/day), proper waste segregation (5 pts) and timely collections before 90% full (20 pts). Badges unlock when you hit specific milestones — check your Profile page!",
+    "keywords": ["points", "badges", "score", "streak", "reward", "earn", "gamification", "achievement", "level up"]
+  },
+  {
+    "id": "locations",
+    "question": "Can I manage multiple bins or locations?",
+    "answer": "Yes! Open the Locations page to add bins across different buildings, floors or areas. Each location gets its own analytics, and you can watch them all on the Map page.",
+    "keywords": ["multiple", "location", "buildings", "floor", "area", "add bin", "new location", "map", "address"]
+  },
+  {
+    "id": "browsers",
+    "question": "Which browsers and devices are supported?",
+    "answer": "All modern browsers work: Chrome, Firefox, Safari and Edge (latest versions). Chrome/Firefox give the best experience, mobile browsers are fully supported, and the app is installable as a PWA.",
+    "keywords": ["browser", "chrome", "firefox", "safari", "edge", "pwa", "install app", "mobile", "phone", "tablet", "android", "iphone"]
+  },
+  {
+    "id": "export",
+    "question": "How do I export my data?",
+    "answer": "Go to the Reports page, choose your date range and format (PDF/CSV/Excel), then click Generate Report. You can download, print or preview the report right there.",
+    "keywords": ["export", "report", "download", "pdf", "csv", "excel", "generate", "print", "backup"]
+  },
+  {
+    "id": "videos",
+    "question": "Are there video tutorials?",
+    "answer": "Yes! Open the Help page and scroll to 'Video Tutorials' — watch Getting Started, Proper Waste Segregation and Understanding Analytics guides right in the app.",
+    "keywords": ["video", "tutorial", "watch", "guide video", "demo", "how to watch"]
+  },
+  {
+    "id": "realtime",
+    "question": "How do I see live data?",
+    "answer": "The Dashboard updates in real time over WebSocket — fill levels, predictions and activity stream in live. For older data, check the Analytics page or Time Range filters.",
+    "keywords": ["live", "realtime", "real time", "stream", "refresh", "update", "current", "webSocket", "dashboard"]
+  },
+  {
+    "id": "human",
+    "question": "Can I talk to a real person?",
+    "answer": "Of course! If I can't help, reach the team at support@wastesegregator.com (or use the Email Support / Live Chat buttons on the Help page under 'Still Need Help?').",
+    "keywords": ["human", "agent", "operator", "person", "real person", "support team", "staff", "live chat", "contact", "email support", "escalate", "talk to someone"]
+  }
+]

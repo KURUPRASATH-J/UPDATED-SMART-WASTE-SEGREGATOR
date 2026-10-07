@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" sizes="32x32" href="/frontend/assets/images/favicon-32x32.png?v=1">
+<link rel="icon" type="image/png" sizes="16x16" href="/frontend/assets/images/favicon-16x16.png?v=1">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo.png?v=1" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo-dark.png?v=1" media="(prefers-color-scheme: dark)">
+<link rel="shortcut icon" href="/frontend/assets/images/favicon.ico?v=1">
+<link rel="apple-touch-icon" sizes="180x180" href="/frontend/assets/images/apple-touch-icon.png?v=1">
+<meta name="theme-color" content="#091020">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waste Segregation Guide - Smart Waste Segregator</title>
+<meta name="description" content="Learn what goes in wet vs dry waste bins with our interactive guide">
+<link rel="stylesheet" href="/frontend/shared/css/themes.css">
+<link rel="stylesheet" href="/frontend/shared/css/animations.css">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 100px 20px 40px 20px;
+  transition: background 1s ease;
+}
+
+.guide-container { max-width: 1100px; margin: 0 auto; }
+
+/* Hero */
+.hero { text-align: center; margin-bottom: 50px; }
+.hero h1 { font-size: 2.8rem; margin-bottom: 15px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero p { opacity: 0.8; font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+
+/* Search */
+.search-box { max-width: 500px; margin: 0 auto 50px; position: relative; }
+.search-box input { width: 100%; padding: 16px 50px 16px 22px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; color: var(--text-primary); font-size: 1rem; transition: all 0.3s; }
+body.theme-light .search-box input { background: white; color: #111; border-color: rgba(0,0,0,0.2); }
+.search-box input:focus { outline: none; border-color: #00d4ff; box-shadow: 0 0 20px rgba(0,212,255,0.2); }
+.search-box input::placeholder { color: var(--text-secondary); }
+.search-box .search-icon { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); font-size: 1.3rem; opacity: 0.6; }
+
+/* Category Grid */
+.categories { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 50px; }
+
+.category { background: var(--bg-card); backdrop-filter: blur(20px); border-radius: 20px; padding: 35px; border: 1px solid var(--border-color); }
+body.theme-light .category { background: rgba(255,255,255,0.9); border-color: rgba(0,0,0,0.1); }
+.category.wet { border-top: 4px solid #00aaff; }
+.category.dry { border-top: 4px solid #00ff99; }
+
+.category h2 { font-size: 1.6rem; margin-bottom: 5px; }
+.category h2.wet-title { color: #00aaff; }
+.category h2.dry-title { color: var(--success); }
+.category .subtitle { opacity: 0.7; font-size: 0.9rem; margin-bottom: 25px; }
+
+.item-list { list-style: none; }
+.item-list li { padding: 12px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 14px; transition: all 0.3s; }
+body.theme-light .item-list li { border-bottom-color: rgba(0,0,0,0.06); }
+.item-list li:hover { padding-left: 8px; }
+.item-list li:last-child { border-bottom: none; }
+.item-icon { font-size: 1.4rem; width: 35px; text-align: center; flex-shrink: 0; }
+.item-name { font-weight: 600; }
+.item-desc { font-size: 0.82rem; opacity: 0.65; }
+.hidden { display: none !important; }
+
+/* Tips Section */
+.tips-section { margin-bottom: 50px; }
+.tips-section h2 { font-size: 1.8rem; text-align: center; margin-bottom: 30px; }
+.tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+.tip-card { background: var(--bg-card); backdrop-filter: blur(15px); border: 1px solid var(--border-color); border-radius: 16px; padding: 30px; text-align: center; transition: all 0.3s; }
+body.theme-light .tip-card { background: rgba(255,255,255,0.9); border-color: rgba(0,0,0,0.1); }
+.tip-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
+.tip-icon { font-size: 2.5rem; margin-bottom: 15px; }
+.tip-card h3 { margin-bottom: 10px; font-size: 1.1rem; }
+.tip-card p { opacity: 0.75; font-size: 0.9rem; line-height: 1.6; }
+
+/* Quiz Section */
+.quiz-section { margin-bottom: 50px; text-align: center; }
+.quiz-section h2 { font-size: 1.8rem; margin-bottom: 15px; }
+.quiz-section .subtitle { opacity: 0.7; margin-bottom: 30px; }
+
+.quiz-card { background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 20px; padding: 40px; max-width: 550px; margin: 0 auto; }
+body.theme-light .quiz-card { background: rgba(255,255,255,0.9); border-color: rgba(0,0,0,0.1); }
+.quiz-item { font-size: 3rem; margin-bottom: 10px; }
+.quiz-question { font-size: 1.3rem; font-weight: 600; margin-bottom: 25px; }
+.quiz-progress { font-size: 0.85rem; opacity: 0.6; margin-bottom: 20px; }
+.quiz-options { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; }
+.quiz-btn { padding: 14px 35px; border: 2px solid var(--border-color); border-radius: 14px; background: var(--bg-card); color: var(--text-primary); font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+body.theme-light .quiz-btn { color: #111; border-color: rgba(0,0,0,0.2); background: rgba(0,0,0,0.03); }
+.quiz-btn.wet-btn:hover { background: rgba(0,170,255,0.2); border-color: #00aaff; }
+.quiz-btn.dry-btn:hover { background: rgba(0,255,153,0.2); border-color: #00ff99; }
+.quiz-btn.correct { background: rgba(0,255,100,0.3) !important; border-color: #00ff66 !important; }
+.quiz-btn.wrong { background: rgba(255,50,50,0.3) !important; border-color: #ff4444 !important; }
+.quiz-feedback { font-size: 1rem; font-weight: 600; min-height: 30px; }
+.quiz-result { text-align: center; }
+.quiz-score { font-size: 3rem; font-weight: 700; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.quiz-restart { margin-top: 20px; padding: 12px 30px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); border: none; border-radius: 12px; color: #111; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+.quiz-restart:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,212,255,0.4); }
+
+@media (max-width: 768px) {
+  body { padding: 80px 15px 30px; }
+  .hero h1 { font-size: 2rem; }
+  .categories { grid-template-columns: 1fr; }
+  .quiz-options { flex-direction: column; }
+}
+
+
+/* Sidebar */
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none;}
+.sidebar{position:fixed;left:0;top:0;height:100%;width:260px;background:var(--bg-card);backdrop-filter:blur(20px);border-right:1px solid var(--border-color);padding:20px 12px;z-index:1000;transform:translateX(-100%);transition:transform 0.35s cubic-bezier(.4,0,.2,1);overflow-y:auto;}
+.sidebar.active{transform:translateX(0);}
+.close-btn{position:absolute;top:18px;right:14px;background:none;border:none;color:var(--text-secondary);font-size:1.5rem;cursor:pointer;transition:color 0.2s;}
+.close-btn:hover{color:#ff6b6b;}
+.nav-links{list-style:none;}
+.nav-links li{margin-bottom:1px;}
+.nav-links a{display:flex;align-items:center;gap:10px;padding:10px 14px;color:var(--text-secondary);text-decoration:none;border-radius:10px;transition:all 0.2s;font-size:0.88rem;}
+.nav-links a:hover{background:var(--bg-secondary);color:var(--text-primary);}
+.nav-links a.active{background:linear-gradient(135deg,rgba(0,212,255,0.12),rgba(0,255,136,0.06));color:var(--accent-primary);font-weight:500;border-left:3px solid var(--accent-primary);}
+.nav-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:8px;flex-shrink:0;}
+.hamburger{position:fixed;top:18px;left:18px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-primary);font-size:1.3rem;padding:7px 11px;border-radius:8px;cursor:pointer;z-index:999;backdrop-filter:blur(10px);transition:background 0.2s;}
+.hamburger:hover{background:var(--bg-secondary);}
+</style>
+</head>
+<body class="page-transition">
+{% include '_sidebar.html' %}
+<!-- Sidebar -->
+
+<div class="guide-container">
+
+  <!-- Hero -->
+  <div class="hero slide-up">
+    <h1>📖 Waste Segregation Guide</h1>
+    <p>Learn which items go in the wet bin vs dry bin. Proper segregation helps the environment and earns you eco points!</p>
+  </div>
+
+  <!-- Search -->
+  <div class="search-box slide-up">
+    <input type="text" id="searchInput" placeholder="Search for an item (e.g. banana peel, plastic bottle)...">
+    <span class="search-icon">🔍</span>
+  </div>
+
+  <!-- Categories -->
+  <div class="categories">
+    <div class="category wet slide-up">
+      <h2 class="wet-title">💧 Wet Waste</h2>
+      <p class="subtitle">Biodegradable / Organic waste</p>
+      <ul class="item-list" id="wetItems">
+        <li data-name="banana peel"><span class="item-icon">🍌</span><div><div class="item-name">Banana Peel</div><div class="item-desc">Fruit peels decompose naturally</div></div></li>
+        <li data-name="vegetable scraps"><span class="item-icon">🥕</span><div><div class="item-name">Vegetable Scraps</div><div class="item-desc">Onion skins, potato peels, etc.</div></div></li>
+        <li data-name="cooked food leftover"><span class="item-icon">🍛</span><div><div class="item-name">Cooked Food</div><div class="item-desc">Leftover rice, curry, bread</div></div></li>
+        <li data-name="tea bags coffee grounds"><span class="item-icon">🍵</span><div><div class="item-name">Tea Bags & Coffee Grounds</div><div class="item-desc">Natural biodegradable waste</div></div></li>
+        <li data-name="egg shells"><span class="item-icon">🥚</span><div><div class="item-name">Egg Shells</div><div class="item-desc">Crushed shells compost well</div></div></li>
+        <li data-name="flowers garden waste"><span class="item-icon">🌸</span><div><div class="item-name">Flowers & Garden Waste</div><div class="item-desc">Leaves, dried flowers, grass</div></div></li>
+        <li data-name="meat fish bones"><span class="item-icon">🍖</span><div><div class="item-name">Meat & Fish Waste</div><div class="item-desc">Bones, skin, unused parts</div></div></li>
+        <li data-name="dairy products spoiled milk"><span class="item-icon">🧀</span><div><div class="item-name">Spoiled Dairy</div><div class="item-desc">Expired milk, cheese, curd</div></div></li>
+        <li data-name="fruit peels orange apple mango"><span class="item-icon">🍎</span><div><div class="item-name">Fruit Peels</div><div class="item-desc">Apple cores, mango peels, orange rinds</div></div></li>
+      </ul>
+    </div>
+
+    <div class="category dry slide-up">
+      <h2 class="dry-title">♻️ Dry Waste</h2>
+      <p class="subtitle">Recyclable / Non-biodegradable waste</p>
+      <ul class="item-list" id="dryItems">
+        <li data-name="plastic bottle water"><span class="item-icon">🧴</span><div><div class="item-name">Plastic Bottles</div><div class="item-desc">Rinse before disposing</div></div></li>
+        <li data-name="paper notebook"><span class="item-icon">📄</span><div><div class="item-name">Paper & Notebooks</div><div class="item-desc">Newspapers, magazines, office paper</div></div></li>
+        <li data-name="cardboard box packaging"><span class="item-icon">📦</span><div><div class="item-name">Cardboard</div><div class="item-desc">Flatten boxes before disposing</div></div></li>
+        <li data-name="metal can aluminum tin"><span class="item-icon">🥫</span><div><div class="item-name">Metal Cans</div><div class="item-desc">Aluminium cans, tin containers</div></div></li>
+        <li data-name="glass bottle jar"><span class="item-icon">🫙</span><div><div class="item-name">Glass Bottles & Jars</div><div class="item-desc">Handle carefully, rinse first</div></div></li>
+        <li data-name="plastic bag wrapper packaging"><span class="item-icon">🛍️</span><div><div class="item-name">Plastic Bags & Wrappers</div><div class="item-desc">Chip packets, poly bags, wrappers</div></div></li>
+        <li data-name="cloth fabric textile"><span class="item-icon">👕</span><div><div class="item-name">Old Clothes & Fabric</div><div class="item-desc">Torn clothes, rags, textile waste</div></div></li>
+        <li data-name="rubber shoe slipper"><span class="item-icon">👟</span><div><div class="item-name">Rubber & Footwear</div><div class="item-desc">Old slippers, rubber bands</div></div></li>
+        <li data-name="electronic e-waste cable charger"><span class="item-icon">🔌</span><div><div class="item-name">E-Waste</div><div class="item-desc">Old cables, broken chargers, small electronics</div></div></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Tips -->
+  <div class="tips-section">
+    <h2 class="slide-up">💡 Pro Tips</h2>
+    <div class="tips-grid">
+      <div class="tip-card slide-up">
+        <div class="tip-icon">🚿</div>
+        <h3>Rinse Containers</h3>
+        <p>Always rinse plastic and glass containers before putting them in the dry bin to prevent contamination.</p>
+      </div>
+      <div class="tip-card slide-up">
+        <div class="tip-icon">📦</div>
+        <h3>Separate Packaging</h3>
+        <p>Remove food from packaging. Food goes in wet bin, packaging in dry bin.</p>
+      </div>
+      <div class="tip-card slide-up">
+        <div class="tip-icon">🌱</div>
+        <h3>Compost at Home</h3>
+        <p>Kitchen scraps can be composted in a small balcony composter for nutrient-rich soil.</p>
+      </div>
+      <div class="tip-card slide-up">
+        <div class="tip-icon">🚫</div>
+        <h3>Reduce Single-Use</h3>
+        <p>Carry reusable bags, bottles, and containers to minimize waste generation.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz -->
+  <div class="quiz-section">
+    <h2 class="slide-up">🎯 Quick Quiz</h2>
+    <p class="subtitle slide-up">Test your waste segregation knowledge!</p>
+    <div class="quiz-card slide-up" id="quizCard">
+      <div class="quiz-progress" id="quizProgress">Question 1 of 5</div>
+      <div class="quiz-item" id="quizEmoji">🍌</div>
+      <div class="quiz-question" id="quizQuestion">Where does a banana peel go?</div>
+      <div class="quiz-options">
+        <button class="quiz-btn wet-btn" onclick="answerQuiz('wet')">💧 Wet Bin</button>
+        <button class="quiz-btn dry-btn" onclick="answerQuiz('dry')">♻️ Dry Bin</button>
+      </div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+
+// ==========================================
+// Search Filter
+// ==========================================
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', function () {
+  const query = this.value.toLowerCase().trim();
+  document.querySelectorAll('.item-list li').forEach(li => {
+    const name = li.getAttribute('data-name') || '';
+    li.classList.toggle('hidden', query.length > 0 && !name.includes(query));
+  });
+});
+
+// ==========================================
+// Quiz
+// ==========================================
+const quizData = [
+  { emoji: '🍌', question: 'Where does a banana peel go?', answer: 'wet' },
+  { emoji: '🧴', question: 'Where does a plastic bottle go?', answer: 'dry' },
+  { emoji: '🍵', question: 'Where do tea bags go?', answer: 'wet' },
+  { emoji: '📦', question: 'Where does a cardboard box go?', answer: 'dry' },
+  { emoji: '🥚', question: 'Where do egg shells go?', answer: 'wet' },
+];
+
+let currentQ = 0;
+let score = 0;
+let answered = false;
+
+function loadQuestion() {
+  if (currentQ >= quizData.length) {
+    showResult();
+    return;
+  }
+  answered = false;
+  const q = quizData[currentQ];
+  document.getElementById('quizEmoji').textContent = q.emoji;
+  document.getElementById('quizQuestion').textContent = q.question;
+  document.getElementById('quizProgress').textContent = `Question ${currentQ + 1} of ${quizData.length}`;
+  document.getElementById('quizFeedback').textContent = '';
+  document.querySelectorAll('.quiz-btn').forEach(b => { b.classList.remove('correct', 'wrong'); b.disabled = false; });
+}
+
+window.answerQuiz = function (choice) {
+  if (answered) return;
+  answered = true;
+  const correct = quizData[currentQ].answer;
+  const btns = document.querySelectorAll('.quiz-btn');
+  btns.forEach(b => b.disabled = true);
+
+  if (choice === correct) {
+    score++;
+    document.getElementById('quizFeedback').textContent = '✅ Correct!';
+    document.getElementById('quizFeedback').style.color = 'var(--success)';
+    btns.forEach(b => { if ((choice === 'wet' && b.classList.contains('wet-btn')) || (choice === 'dry' && b.classList.contains('dry-btn'))) b.classList.add('correct'); });
+  } else {
+    document.getElementById('quizFeedback').textContent = '❌ Wrong! It goes in the ' + correct + ' bin.';
+    document.getElementById('quizFeedback').style.color = 'var(--danger)';
+    btns.forEach(b => { if ((choice === 'wet' && b.classList.contains('wet-btn')) || (choice === 'dry' && b.classList.contains('dry-btn'))) b.classList.add('wrong'); });
+  }
+
+  setTimeout(() => { currentQ++; loadQuestion(); }, 1500);
+};
+
+function showResult() {
+  const card = document.getElementById('quizCard');
+  const pct = Math.round((score / quizData.length) * 100);
+  card.innerHTML = `
+    <div class="quiz-result">
+      <div class="quiz-score">${score}/${quizData.length}</div>
+      <p style="margin-top:10px;font-size:1.2rem;font-weight:600;">${pct === 100 ? '🎉 Perfect Score!' : pct >= 60 ? '👏 Great job!' : '📚 Keep learning!'}</p>
+      <p style="opacity:0.7;margin-top:8px;">You scored ${pct}%</p>
+      <button class="quiz-restart" onclick="restartQuiz()">🔄 Try Again</button>
+    </div>
+  `;
+  if (pct === 100) {
+    // Simple confetti
+    for (let i = 0; i < 40; i++) {
+      const c = document.createElement('div');
+      c.style.cssText = `position:fixed;width:8px;height:8px;border-radius:50%;top:-10px;left:${Math.random()*100}vw;background:${['#00d4ff','#00ff99','#ff6b35','#9932ff','#ffaa00'][Math.floor(Math.random()*5)]};z-index:9999;animation:confettiFall ${2+Math.random()*2}s ease-in forwards;animation-delay:${Math.random()*0.5}s;pointer-events:none;`;
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 4000);
+    }
+  }
+}
+
+window.restartQuiz = function () {
+  currentQ = 0; score = 0;
+  document.getElementById('quizCard').innerHTML = `
+    <div class="quiz-progress" id="quizProgress">Question 1 of ${quizData.length}</div>
+    <div class="quiz-item" id="quizEmoji"></div>
+    <div class="quiz-question" id="quizQuestion"></div>
+    <div class="quiz-options">
+      <button class="quiz-btn wet-btn" onclick="answerQuiz('wet')">💧 Wet Bin</button>
+      <button class="quiz-btn dry-btn" onclick="answerQuiz('dry')">♻️ Dry Bin</button>
+    </div>
+    <div class="quiz-feedback" id="quizFeedback"></div>
+  `;
+  loadQuestion();
+};
+
+loadQuestion();
+
+// Confetti animation
+const style = document.createElement('style');
+style.textContent = `@keyframes confettiFall { 0%{transform:translateY(0) rotate(0deg);opacity:1;} 100%{transform:translateY(100vh) rotate(720deg);opacity:0;} }`;
+document.head.appendChild(style);
+</script>
+<script type="module" src="/frontend/shared/js/theme-switcher.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="binBody" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#00d4ff"/>
+      <stop offset="1" stop-color="#0090b8"/>
+    </linearGradient>
+    <linearGradient id="drop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#00ff99"/>
+      <stop offset="1" stop-color="#00cc77"/>
+    </linearGradient>
+  </defs>
+  <!-- Lid -->
+  <rect x="96" y="80" width="320" height="44" rx="16" fill="#0e2a3a"/>
+  <!-- Bin body -->
+  <path d="M120 140 h272 l-22 292 a24 24 0 0 1 -24 22 h-180 a24 24 0 0 1 -24 -22 z" fill="url(#binBody)"/>
+  <rect x="120" y="140" width="272" height="28" fill="#00ff88" opacity="0.85"/>
+  <!-- Wet drop -->
+  <path d="M256 208 c-30 44 -52 76 -52 108 a52 52 0 0 0 104 0 c0 -32 -22 -64 -52 -108 z" fill="url(#drop)"/>
+  <!-- Shine -->
+  <ellipse cx="196" cy="240" rx="20" ry="64" fill="#ffffff" opacity="0.18"/>
+</svg>

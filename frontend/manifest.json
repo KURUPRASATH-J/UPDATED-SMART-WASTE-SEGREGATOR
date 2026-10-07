@@ -1,0 +1,71 @@
+{
+  "name": "Smart Waste Segregator",
+  "short_name": "Waste Segregator",
+  "description": "IoT-based smart waste segregation and monitoring system with real-time bin level tracking",
+  "start_url": "/frontend/dashboard.html",
+  "display": "standalone",
+  "background_color": "#091020",
+  "theme_color": "#091020",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/frontend/assets/images/favicon-16x16.png?v=1",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/frontend/assets/images/favicon-32x32.png?v=1",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/frontend/assets/images/apple-touch-icon.png?v=1",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/frontend/assets/images/icon-192.png?v=1",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/frontend/assets/images/icon-512.png?v=1",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/frontend/assets/images/icon-maskable-512.png?v=1",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": [
+    "utilities",
+    "productivity",
+    "lifestyle"
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View waste levels",
+      "url": "/frontend/dashboard.html"
+    },
+    {
+      "name": "Analytics",
+      "short_name": "Analytics",
+      "description": "View waste analytics",
+      "url": "/frontend/pages/analytics.html"
+    },
+    {
+      "name": "Guide",
+      "short_name": "Guide",
+      "description": "Waste segregation guide",
+      "url": "/frontend/pages/guide.html"
+    }
+  ]
+}

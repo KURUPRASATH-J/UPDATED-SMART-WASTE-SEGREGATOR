@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" sizes="32x32" href="/frontend/assets/images/favicon-32x32.png?v=1">
+<link rel="icon" type="image/png" sizes="16x16" href="/frontend/assets/images/favicon-16x16.png?v=1">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo.png?v=1" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo-dark.png?v=1" media="(prefers-color-scheme: dark)">
+<link rel="shortcut icon" href="/frontend/assets/images/favicon.ico?v=1">
+<link rel="apple-touch-icon" sizes="180x180" href="/frontend/assets/images/apple-touch-icon.png?v=1">
+<meta name="theme-color" content="#091020">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile - Smart Waste Segregator</title>
+<link rel="stylesheet" href="/frontend/shared/css/themes.css">
+<link rel="stylesheet" href="/frontend/shared/css/animations.css">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 100px 20px 40px 20px;
+}
+
+.profile-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.profile-header {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.avatar-upload {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 20px;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00d4ff, #00ff99);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: bold;
+  color: #111;
+  position: relative;
+  overflow: hidden;
+}
+
+.avatar-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-edit {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 38px;
+  height: 38px;
+  background: #00d4ff;
+  color: #0a0e1a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 3px solid #091020;
+  font-size: 1.05rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.avatar-edit:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 18px rgba(0, 212, 255, 0.5);
+}
+
+/* Avatar picker modal */
+.avatar-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 8, 18, 0.72);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.avatar-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 18px;
+  max-width: 420px;
+  width: 100%;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+.avatar-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.avatar-modal-header h3 { font-size: 1.05rem; }
+.avatar-modal-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  font-family: inherit;
+}
+.avatar-modal-close:hover { color: #ff6b6b; }
+.avatar-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+  font-family: inherit;
+  color: var(--text-primary);
+}
+.avatar-option:hover {
+  border-color: var(--accent-primary);
+  transform: translateY(-2px);
+}
+.avatar-option-icon { font-size: 1.6rem; flex-shrink: 0; }
+.avatar-option-title { font-weight: 700; font-size: 0.95rem; }
+.avatar-option-sub { display: block; opacity: 0.6; font-size: 0.78rem; margin-top: 2px; }
+.avatar-preview-wrap {
+  width: 130px;
+  height: 130px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--accent-primary);
+  background: var(--bg-secondary);
+}
+.avatar-preview-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-actions { display: flex; justify-content: center; gap: 10px; margin-top: 6px; }
+.avatar-actions .btn-secondary { margin-left: 0; }
+.avatar-hint { text-align: center; opacity: 0.55; font-size: 0.78rem; margin-top: 10px; }
+.avatar-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.avatar-preset {
+  width: 100%;
+  padding: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  background: none;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.avatar-preset:hover {
+  border-color: var(--accent-primary);
+  transform: scale(1.08);
+}
+.avatar-preset img { width: 100%; height: auto; display: block; border-radius: 50%; }
+[hidden] { display: none !important; }
+
+.profile-info {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 40px;
+  margin-bottom: 30px;
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.form-group select option { color: #111; background: #fff; }
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #00d4ff;
+  background: var(--bg-secondary);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.btn {
+  padding: 14px 30px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #00d4ff, #00ff99);
+  color: #111;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+}
+
+.btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  margin-left: 10px;
+}
+
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  border-radius: 15px;
+  padding: 25px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  margin: 10px 0;
+}
+
+.badges-section {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 40px;
+}
+
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.badge-item {
+  text-align: center;
+  padding: 20px;
+  background: var(--bg-card);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.badge-item:hover {
+  transform: translateY(-5px);
+  background: var(--bg-secondary);
+}
+
+.badge-icon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.badge-name {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.badge-locked {
+  opacity: 0.3;
+  filter: grayscale(100%);
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 80px 20px 40px 20px;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Sidebar */
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none;}
+.sidebar{position:fixed;left:0;top:0;height:100%;width:260px;background:var(--bg-card);backdrop-filter:blur(20px);border-right:1px solid var(--border-color);padding:20px 12px;z-index:1000;transform:translateX(-100%);transition:transform 0.35s cubic-bezier(.4,0,.2,1);overflow-y:auto;}
+.sidebar.active{transform:translateX(0);}
+.close-btn{position:absolute;top:18px;right:14px;background:none;border:none;color:var(--text-secondary);font-size:1.5rem;cursor:pointer;transition:color 0.2s;}
+.close-btn:hover{color:#ff6b6b;}
+.nav-links{list-style:none;}
+.nav-links li{margin-bottom:1px;}
+.nav-links a{display:flex;align-items:center;gap:10px;padding:10px 14px;color:var(--text-secondary);text-decoration:none;border-radius:10px;transition:all 0.2s;font-size:0.88rem;}
+.nav-links a:hover{background:var(--bg-secondary);color:var(--text-primary);}
+.nav-links a.active{background:linear-gradient(135deg,rgba(0,212,255,0.12),rgba(0,255,136,0.06));color:var(--accent-primary);font-weight:500;border-left:3px solid var(--accent-primary);}
+.nav-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:8px;flex-shrink:0;}
+.hamburger{position:fixed;top:18px;left:18px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-primary);font-size:1.3rem;padding:7px 11px;border-radius:8px;cursor:pointer;z-index:999;backdrop-filter:blur(10px);transition:background 0.2s;}
+.hamburger:hover{background:var(--bg-secondary);}
+</style>
+</head>
+<body>
+{% include '_sidebar.html' %}
+<div class="profile-container">
+  <div class="profile-header slide-up">
+    <div class="avatar-upload">
+      <div class="avatar" id="profileAvatar">
+        <img class="avatar-img" id="profileAvatarImg" alt="Profile picture" hidden>
+        <span id="profileAvatarInitial">U</span>
+      </div>
+      <button type="button" class="avatar-edit" id="avatarEditBtn" title="Change profile picture" aria-label="Change profile picture">📷</button>
+    </div>
+    <input type="file" id="avatarFileInput" accept="image/*" hidden>
+    <h1 id="profileName">User Name</h1>
+    <p id="profileEmail">user@example.com</p>
+  </div>
+
+  <div class="stats-cards fade-in-stagger">
+    <div class="stat-card">
+      <h3>Points</h3>
+      <div class="stat-value" id="userPoints">0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Streak</h3>
+      <div class="stat-value" id="userStreak">0 🔥</div>
+    </div>
+    <div class="stat-card">
+      <h3>Badges</h3>
+      <div class="stat-value" id="badgeCount">0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Rank</h3>
+      <div class="stat-value" id="userRank">#-</div>
+    </div>
+  </div>
+
+  <div class="profile-info slide-up delay-2">
+    <h2>Personal Information</h2>
+    <form id="profileForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="fullName" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="email" disabled>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="phone">
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <select id="role" class="styled-select" disabled>
+            <option value="resident">Resident</option>
+            <option value="cleaner">Cleaner</option>
+            <option value="supervisor">Supervisor</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Location/Building</label>
+        <input type="text" id="location" required>
+      </div>
+      
+      <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+      <button type="button" class="btn btn-secondary" onclick="window.location.href='/dashboard.html'">Cancel</button>
+    </form>
+  </div>
+
+  <div class="badges-section slide-up delay-3">
+    <h2>Achievements & Badges</h2>
+    <div class="badges-grid" id="badgesGrid"></div>
+  </div>
+</div>
+
+<!-- Avatar picker modal -->
+<div class="avatar-modal-overlay" id="avatarModal" hidden>
+  <div class="avatar-modal">
+    <div class="avatar-modal-header">
+      <h3>Change Profile Picture</h3>
+      <button type="button" class="avatar-modal-close" id="avatarModalClose" aria-label="Close">&times;</button>
+    </div>
+
+    <div id="avatarStepChoose">
+      <button type="button" class="avatar-option" id="avatarOptionUpload">
+        <span class="avatar-option-icon">📷</span>
+        <span><span class="avatar-option-title">Upload a photo</span><span class="avatar-option-sub">Choose an image from your device</span></span>
+      </button>
+      <button type="button" class="avatar-option" id="avatarOptionPreset">
+        <span class="avatar-option-icon">🎨</span>
+        <span><span class="avatar-option-title">Choose an avatar</span><span class="avatar-option-sub">Pick a built-in illustrated avatar</span></span>
+      </button>
+    </div>
+
+    <div id="avatarStepUpload" hidden>
+      <div class="avatar-preview-wrap"><img id="avatarUploadPreview" alt="Image preview"></div>
+      <div class="avatar-actions">
+        <button type="button" class="btn btn-primary" id="avatarUploadConfirm">Upload Photo</button>
+        <button type="button" class="btn btn-secondary avatar-back" data-back="choose">Back</button>
+      </div>
+      <div class="avatar-hint">JPG, PNG or WebP up to 2&nbsp;MB.</div>
+    </div>
+
+    <div id="avatarStepPreset" hidden>
+      <div class="avatar-preset-grid" id="avatarPresetGrid"></div>
+      <div class="avatar-actions">
+        <button type="button" class="btn btn-secondary avatar-back" data-back="choose">Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Load the real logged-in user from Flask:
+//   identity   -> /api/auth/me            (user: {..})
+//   stats/badges -> /api/gamification     (ecoScore/streakDays/badges/allBadges)
+//   phone/location -> /api/settings       (flat key/value dict)
+//   rank       -> /api/gamification/leaderboard (position by eco_score)
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+async function loadUserProfile() {
+  var user = null, gam = null, settings = null;
+
+  try {
+    var meRes = await fetch('/api/auth/me');
+    if (meRes.ok) {
+      var me = await meRes.json();
+      user = me.user || null;
+    }
+  } catch (e) { console.warn('Could not reach /api/auth/me'); }
+
+  if (user && user.id != null) {
+    try {
+      var gRes = await fetch('/api/gamification');
+      if (gRes.ok) gam = await gRes.json();
+    } catch (e) {}
+    try {
+      var sRes = await fetch('/api/settings');
+      if (sRes.ok) settings = await sRes.json();
+    } catch (e) {}
+  } else {
+    // Logged out: graceful fallback to a locally cached identity if present.
+    try {
+      var stored = localStorage.getItem('user');
+      if (stored) {
+        var d = JSON.parse(stored);
+        user = d.user || d;
+      }
+    } catch (e) {}
+  }
+
+  var displayName = (user && (user.fullName || user.username)) || 'User';
+  var email = (user && user.email) || '';
+  document.getElementById('profileName').textContent = displayName;
+  document.getElementById('profileEmail').textContent = email || 'user@example.com';
+  applyProfileAvatar((user && user.avatarUrl) || '');
+  document.getElementById('profileAvatarInitial').textContent = (displayName || 'U').charAt(0).toUpperCase();
+  document.getElementById('fullName').value = (user && user.fullName) || '';
+  document.getElementById('email').value = email;
+  document.getElementById('role').value = (user && user.role) || 'resident';
+  document.getElementById('phone').value = (settings && settings.phone) || '';
+  document.getElementById('location').value = (settings && settings.location) || '';
+
+  var points = (gam && gam.ecoScore) || 0;
+  var streak = (gam && gam.streakDays) || 0;
+  var badges = (gam && gam.badges) || [];
+  document.getElementById('userPoints').textContent = points;
+  document.getElementById('userStreak').textContent = streak + ' 🔥';
+  document.getElementById('badgeCount').textContent = badges.length;
+
+  // Real rank from the live leaderboard (all-time, top 100).
+  document.getElementById('userRank').textContent = '—';
+  if (user && user.id != null) {
+    try {
+      var lbRes = await fetch('/api/gamification/leaderboard?limit=100&period=all');
+      if (lbRes.ok) {
+        var rows = await lbRes.json();
+        var idx = rows.findIndex(function(r) { return r.id === user.id; });
+        if (idx > -1) document.getElementById('userRank').textContent = '#' + (idx + 1);
+      }
+    } catch (e) {}
+  }
+
+  renderBadges(gam);
+}
+
+function renderBadges(gam) {
+  var grid = document.getElementById('badgesGrid');
+  var all = (gam && gam.allBadges) || [];
+  var earned = {};
+  ((gam && gam.badges) || []).forEach(function(b) { earned[b.id] = true; });
+
+  if (!all.length) {
+    grid.innerHTML = '<div class="badge-item badge-locked" style="grid-column:1/-1;">' +
+      '<div class="badge-icon">🎖️</div><div class="badge-name">No badges available yet</div></div>';
+    return;
+  }
+
+  grid.innerHTML = all.map(function(b) {
+    var locked = !earned[b.id];
+    return '<div class="badge-item' + (locked ? ' badge-locked' : '') + '" title="' + esc(b.description || '') + '">' +
+      '<div class="badge-icon">' + esc(b.icon || '🏅') + '</div>' +
+      '<div class="badge-name">' + esc(b.name) + '</div></div>';
+  }).join('');
+}
+
+// ============ Avatar picker (upload a photo / choose a built-in avatar) ============
+var AVATAR_PRESETS = ['avatar-1','avatar-2','avatar-3','avatar-4','avatar-5',
+                      'avatar-6','avatar-7','avatar-8','avatar-9','avatar-10'];
+
+function showToast(msg, isError) {
+  window.toastNotify(String(msg), isError ? 'error' : 'success');
+}
+
+function avatarCacheBust(url) {
+  return url + (url.indexOf('?') > -1 ? '&t=' : '?t=') + Date.now();
+}
+
+function applyProfileAvatar(url) {
+  var img = document.getElementById('profileAvatarImg');
+  var initial = document.getElementById('profileAvatarInitial');
+  if (img && initial) {
+    if (url) {
+      img.src = avatarCacheBust(url);
+      img.hidden = '';
+      initial.hidden = true;
+    } else {
+      img.hidden = true;
+      initial.hidden = '';
+    }
+  }
+  // Reflect the change app-wide (sidebar card, dashboard topbar, any open tab).
+  // Sidebar/dashboard register on `window`, so dispatch there (a document-level
+  // event without bubbles:true would never reach window listeners).
+  try {
+    window.dispatchEvent(new CustomEvent('avatar-updated', { detail: { avatarUrl: url || '' } }));
+  } catch (e) {}
+}
+
+function openAvatarModal() {
+  showAvatarStep('choose');
+  document.getElementById('avatarModal').hidden = false;
+}
+
+function closeAvatarModal() {
+  document.getElementById('avatarModal').hidden = true;
+}
+
+function showAvatarStep(name) {
+  document.getElementById('avatarStepChoose').hidden = name !== 'choose';
+  document.getElementById('avatarStepUpload').hidden = name !== 'upload';
+  document.getElementById('avatarStepPreset').hidden = name !== 'preset';
+}
+
+function renderAvatarPresets() {
+  var grid = document.getElementById('avatarPresetGrid');
+  if (grid.dataset.rendered) return;
+  grid.dataset.rendered = '1';
+  AVATAR_PRESETS.forEach(function(name) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'avatar-preset';
+    btn.dataset.preset = name;
+    btn.title = 'Choose this avatar';
+    btn.setAttribute('aria-label', 'Choose this avatar');
+    var img = document.createElement('img');
+    img.src = '/assets/images/avatars/' + name + '.svg';
+    img.alt = 'Avatar option';
+    btn.appendChild(img);
+    grid.appendChild(btn);
+  });
+}
+
+function handleAvatarError(msg) {
+  showToast(msg, true);
+  if (msg.indexOf('2 MB') > -1) showAvatarStep('choose');
+}
+
+document.getElementById('avatarEditBtn').addEventListener('click', openAvatarModal);
+document.getElementById('avatarModalClose').addEventListener('click', closeAvatarModal);
+document.getElementById('avatarModal').addEventListener('click', function(e) {
+  if (e.target.id === 'avatarModal') closeAvatarModal();
+});
+
+var pendingAvatarFile = null;
+
+document.getElementById('avatarOptionUpload').addEventListener('click', function() {
+  document.getElementById('avatarFileInput').click();
+});
+document.getElementById('avatarFileInput').addEventListener('change', function(e) {
+  var file = e.target.files && e.target.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    handleAvatarError('Image must be 2 MB or smaller.');
+    return;
+  }
+  if (!/image\/(jpeg|png|webp)/.test(file.type)) {
+    handleAvatarError('Only JPG, PNG or WebP images are allowed.');
+    return;
+  }
+  pendingAvatarFile = file;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    document.getElementById('avatarUploadPreview').src = ev.target.result;
+    showAvatarStep('upload');
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+});
+
+document.getElementById('avatarOptionPreset').addEventListener('click', function() {
+  renderAvatarPresets();
+  showAvatarStep('preset');
+});
+document.getElementById('avatarPresetGrid').addEventListener('click', function(e) {
+  var btn = e.target.closest ? e.target.closest('.avatar-preset') : null;
+  if (!btn) return;
+  var preset = btn.getAttribute('data-preset');
+  var confirmBtn = document.getElementById('avatarUploadConfirm');
+  confirmBtn.disabled = true;
+  var data = new FormData();
+  data.append('preset', preset + '.svg');
+  fetch('/api/profile/avatar', { method: 'POST', credentials: 'include', body: data })
+    .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, j: j }; }); })
+    .then(function(res) {
+      confirmBtn.disabled = false;
+      if (!res.ok || !res.j.avatarUrl) { handleAvatarError((res.j && res.j.error) || 'Could not save avatar.'); return; }
+      applyProfileAvatar(res.j.avatarUrl);
+      try {
+        var stored = JSON.parse(localStorage.getItem('user') || '{}');
+        stored.avatarUrl = res.j.avatarUrl;
+        localStorage.setItem('user', JSON.stringify(stored));
+      } catch (e2) {}
+      closeAvatarModal();
+      showToast('✅ Avatar updated!');
+    })
+    .catch(function() { confirmBtn.disabled = false; handleAvatarError('Network error while saving avatar.'); });
+});
+
+document.getElementById('avatarUploadConfirm').addEventListener('click', function() {
+  var file = pendingAvatarFile;
+  if (!file) return;
+  var btn = this;
+  btn.disabled = true;
+  var data = new FormData();
+  data.append('avatar', file);
+  fetch('/api/profile/avatar', { method: 'POST', credentials: 'include', body: data })
+    .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, j: j }; }); })
+    .then(function(res) {
+      btn.disabled = false;
+      if (!res.ok || !res.j.avatarUrl) { handleAvatarError((res.j && res.j.error) || 'Could not upload image.'); return; }
+      applyProfileAvatar(res.j.avatarUrl);
+      try {
+        var stored = JSON.parse(localStorage.getItem('user') || '{}');
+        stored.avatarUrl = res.j.avatarUrl;
+        localStorage.setItem('user', JSON.stringify(stored));
+      } catch (e2) {}
+      closeAvatarModal();
+      showToast('✅ Avatar updated!');
+    })
+    .catch(function() { btn.disabled = false; handleAvatarError('Network error while uploading image.'); });
+});
+
+document.querySelectorAll('.avatar-back').forEach(function(b) {
+  b.addEventListener('click', function() {
+    showAvatarStep(this.getAttribute('data-back'));
+  });
+});
+
+loadUserProfile();
+
+// Save profile changes via Flask API
+document.getElementById('profileForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  var fullName = document.getElementById('fullName').value;
+  var phone = document.getElementById('phone').value;
+  var location = document.getElementById('location').value;
+  
+  try {
+    var res = await fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fullName: fullName,
+        phone: phone,
+        location: location
+      })
+    });
+    
+    if (res.ok) {
+      // Also update localStorage for consistency
+      var stored = {};
+      try { stored = JSON.parse(localStorage.getItem('user') || '{}'); } catch(e) {}
+      stored.fullName = fullName;
+      stored.phone = phone;
+      stored.location = location;
+      localStorage.setItem('user', JSON.stringify(stored));
+      
+      alert('✅ Profile updated successfully!');
+      window.location.href = '/dashboard.html';
+    } else {
+      alert('❌ Error updating profile. Server returned ' + res.status);
+    }
+  } catch (error) {
+    alert('❌ Error updating profile: ' + error.message);
+  }
+});
+</script>
+
+<script type="module" src="/frontend/shared/js/theme-switcher.js"></script>
+</body>
+</html>

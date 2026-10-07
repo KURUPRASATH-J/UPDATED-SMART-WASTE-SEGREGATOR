@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Avatar illustration">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#16a34a"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs><circle cx="60" cy="60" r="58" fill="url(#g)"/><circle cx="60" cy="60" r="58" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="3"/>
+  <circle cx="60" cy="57" r="26" fill="#ffe0bd"/><circle cx="35" cy="58" r="4.5" fill="#ffe0bd"/><circle cx="85" cy="58" r="4.5" fill="#ffe0bd"/>
+  <path d="M34 50 Q34 28 60 28 Q86 28 86 50 Q80 40 72 40 Q68 46 60 46 Q52 46 48 40 Q40 40 34 50 Z" fill="#14532d"/>
+  <path d="M60 20c-1.5 6-5.5 10-12 11 6.5 1 11.5 5 13 12 .8-7 7.5-11 15-11-9-.8-13.5-6.5-13-9z" fill="#4ade80"/>
+  <circle cx="51" cy="56" r="3.6" fill="#1e293b"/><circle cx="69" cy="56" r="3.6" fill="#1e293b"/><circle cx="52.2" cy="54.8" r="1.1" fill="#fff"/><circle cx="70.2" cy="54.8" r="1.1" fill="#fff"/>
+  <path d="M52 66 Q60 72 68 66" fill="none" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/>
+  <path d="M60 16 Q88 14 96 30 Q102 44 90 48" fill="none" stroke="#052e16" stroke-width="4" stroke-linecap="round"/>
+</svg>

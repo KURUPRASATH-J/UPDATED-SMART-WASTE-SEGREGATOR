@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Locations - Smart Waste Segregator</title>
+<link rel="stylesheet" href="/frontend/shared/css/themes.css">
+<link rel="stylesheet" href="/frontend/shared/css/animations.css">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at top, #091020, #020617);
+  color: white;
+  min-height: 100vh;
+  padding: 100px 20px 40px 20px;
+}
+
+.locations-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+}
+
+.add-location-btn {
+  padding: 14px 30px;
+  background: linear-gradient(135deg, #00d4ff, #00ff99);
+  border: none;
+  border-radius: 12px;
+  color: #111;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-location-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+}
+
+.locations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+.location-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 30px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.location-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 212, 255, 0.3);
+}
+
+.location-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 20px;
+}
+
+.location-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #00d4ff, #00ff99);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.location-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  width: 35px;
+  height: 35px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.location-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.location-address {
+  opacity: 0.7;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.bins-status {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.bin-status {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.bin-status .icon {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.bin-status .level {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #00ff99;
+}
+
+.bin-status .label {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  margin-top: 5px;
+}
+
+.location-stats {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.9rem;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-item .value {
+  font-weight: 700;
+  color: #00d4ff;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 500px;
+  width: 90%;
+  animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.modal-header h2 {
+  font-size: 1.8rem;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: white;
+  font-size: 1rem;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  margin-top: 30px;
+}
+
+.btn-secondary {
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 80px 20px 40px 20px;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .add-location-btn {
+    width: 100%;
+  }
+  
+  .locations-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Sidebar */
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none;}
+.sidebar{position:fixed;left:0;top:0;height:100%;width:260px;background:rgba(12,16,30,0.97);backdrop-filter:blur(20px);border-right:1px solid rgba(255,255,255,0.06);padding:20px 12px;z-index:1000;transform:translateX(-100%);transition:transform 0.35s cubic-bezier(.4,0,.2,1);overflow-y:auto;}
+.sidebar.active{transform:translateX(0);}
+.close-btn{position:absolute;top:18px;right:14px;background:none;border:none;color:rgba(255,255,255,0.4);font-size:1.5rem;cursor:pointer;transition:color 0.2s;}
+.close-btn:hover{color:#ff6b6b;}
+.nav-links{list-style:none;}
+.nav-links li{margin-bottom:1px;}
+.nav-links a{display:flex;align-items:center;gap:10px;padding:10px 14px;color:rgba(255,255,255,0.6);text-decoration:none;border-radius:10px;transition:all 0.2s;font-size:0.88rem;}
+.nav-links a:hover{background:rgba(255,255,255,0.05);color:#fff;}
+.nav-links a.active{background:linear-gradient(135deg,rgba(0,212,255,0.12),rgba(0,255,136,0.06));color:#00d4ff;font-weight:500;border-left:3px solid #00d4ff;}
+.nav-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:8px;flex-shrink:0;}
+.hamburger{position:fixed;top:18px;left:18px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.08);color:#fff;font-size:1.3rem;padding:7px 11px;border-radius:8px;cursor:pointer;z-index:999;backdrop-filter:blur(10px);transition:background 0.2s;}
+.hamburger:hover{background:rgba(255,255,255,0.12);}
+</style>
+</head>
+<body>
+{% include '_sidebar.html' %}
+<div class="locations-container">
+  <div class="page-header slide-up">
+    <h1>📍 Bin Locations</h1>
+    <button class="add-location-btn" onclick="openAddModal()">+ Add Location</button>
+  </div>
+
+  <div class="locations-grid fade-in-stagger" id="locationsGrid"></div>
+</div>
+
+<!-- Add/Edit Location Modal -->
+<div class="modal" id="addLocationModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="locationModalTitle">Add New Location</h2>
+      <button class="close-modal" onclick="closeAddModal()">×</button>
+    </div>
+
+    <form id="addLocationForm">
+      <div class="form-group">
+        <label>Location Name</label>
+        <input type="text" id="locationName" placeholder="e.g., Building A - Floor 3" required>
+      </div>
+
+      <div class="form-group">
+        <label>Address</label>
+        <textarea id="locationAddress" placeholder="Full address of the location" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Icon</label>
+        <select id="locationIcon">
+          <option value="🏢">🏢 Office Building</option>
+          <option value="🏠">🏠 Residential</option>
+          <option value="🏭">🏭 Industrial</option>
+          <option value="🏫">🏫 School</option>
+          <option value="🏥">🏥 Hospital</option>
+          <option value="🍽️">🍽️ Restaurant</option>
+          <option value="🏨">🏨 Hotel</option>
+          <option value="🏪">🏪 Store</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Number of Bins</label>
+        <input type="number" id="locationBins" min="1" max="20" value="2">
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" onclick="closeAddModal()">Cancel</button>
+        <button type="submit" class="add-location-btn">Save Location</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+var LOCATIONS_KEY = 'sws_locations';
+var locations = [];
+
+function openAddModal(id) {
+  var title = document.getElementById('locationModalTitle');
+  title.textContent = id != null ? 'Edit Location' : 'Add New Location';
+  document.getElementById('locationName').value = id != null ? locations[id].name : '';
+  document.getElementById('locationAddress').value = id != null ? locations[id].address : '';
+  document.getElementById('locationIcon').value = id != null ? locations[id].icon : '🏢';
+  document.getElementById('locationBins').value = id != null ? locations[id].bins : 2;
+  document.getElementById('addLocationModal')._editId = id;
+  document.getElementById('addLocationModal').classList.add('show');
+}
+
+function closeAddModal() {
+  document.getElementById('addLocationModal').classList.remove('show');
+  document.getElementById('addLocationModal')._editId = null;
+}
+
+function locationCard(loc) {
+  var wet = Number(loc.wetLevel || 0);
+  var dry = Number(loc.dryLevel || 0);
+  var status = loc.live ? 'Live' : (loc.collections != null ? loc.collections + ' Collections' : 'Active');
+  var card = document.createElement('div');
+  card.className = 'location-card slide-up';
+  card.innerHTML =
+    '<div class="location-header">' +
+      '<div class="location-icon">' + loc.icon + '</div>' +
+      '<div class="location-actions">' +
+        '<button class="action-btn" title="Edit" onclick="editLocation(' + loc.index + ')">✏️</button>' +
+        '<button class="action-btn" title="Delete" onclick="deleteLocation(' + loc.index + ')">🗑️</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="location-name">' + loc.name + '</div>' +
+    '<div class="location-address">' + loc.address + '</div>' +
+    '<div class="bins-status">' +
+      '<div class="bin-status"><div class="icon">💧</div><div class="level">' + wet + '%</div><div class="label">Wet Waste</div></div>' +
+      '<div class="bin-status"><div class="icon">♻️</div><div class="level">' + dry + '%</div><div class="label">Dry Waste</div></div>' +
+    '</div>' +
+    '<div class="location-stats">' +
+      '<div class="stat-item"><div class="value">' + (loc.collections != null ? loc.collections : '-') + '</div><div>Collections</div></div>' +
+      '<div class="stat-item"><div class="value">' + (loc.bins || 2) + '</div><div>Bins</div></div>' +
+      '<div class="stat-item"><div class="value">' + status + '</div><div>Status</div></div>' +
+    '</div>';
+  return card;
+}
+
+function renderLocations() {
+  var grid = document.getElementById('locationsGrid');
+  grid.innerHTML = '';
+  locations.forEach(function(loc, i) {
+    loc.index = i;
+    grid.appendChild(locationCard(loc));
+  });
+  fetchLiveLevels();
+}
+
+function editLocation(index) { openAddModal(index); }
+
+function deleteLocation(index) {
+  if (!confirm('Delete this location?')) return;
+  locations.splice(index, 1);
+  persistAndRender();
+}
+
+function persistAndRender() {
+  try { localStorage.setItem(LOCATIONS_KEY, JSON.stringify(locations)); } catch (e) {}
+  renderLocations();
+}
+
+function fetchLiveLevels() {
+  fetch('/api/bins')
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data || !data.bins) return;
+      var wet = data.bins.wetBin || {}, dry = data.bins.dryBin || {};
+      locations.forEach(function(loc) {
+        loc.wetLevel = wet.level != null ? wet.level : 0;
+        loc.dryLevel = dry.level != null ? dry.level : 0;
+      });
+      renderLocations();
+    })
+    .catch(function(e) { console.error('Locations load error:', e); });
+}
+
+(function init() {
+  var stored = null;
+  try { stored = JSON.parse(localStorage.getItem(LOCATIONS_KEY) || 'null'); } catch (e) {}
+  if (stored && stored.length) {
+    locations = stored;
+  } else {
+    locations = [
+      { name: 'Main Smart Bin', address: 'Device gateway — live data', icon: '🏠', bins: 2, live: true, collections: 0 },
+      { name: 'Demo – Building A', address: 'Main Campus, Block A', icon: '🏢', bins: 2, collections: 24 },
+      { name: 'Demo – Cafeteria', address: 'Main Building, Ground Floor', icon: '🍽️', bins: 2, collections: 42 }
+    ];
+  }
+
+  document.getElementById('addLocationForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var modal = document.getElementById('addLocationModal');
+    var id = modal._editId;
+    var rec = {
+      name: document.getElementById('locationName').value.trim(),
+      address: document.getElementById('locationAddress').value.trim(),
+      icon: document.getElementById('locationIcon').value,
+      bins: parseInt(document.getElementById('locationBins').value, 10) || 2,
+      collections: id != null ? locations[id].collections : 0
+    };
+    if (id != null) { locations[id] = rec; } else { locations.push(rec); }
+    persistAndRender();
+    closeAddModal();
+  });
+
+  renderLocations();
+  setInterval(fetchLiveLevels, 30000);
+  fetch('/api/stats').then(function(r) { return r.json(); }).then(function(s) {
+    if (s && s.totalCollections != null) {
+      locations.forEach(function(loc) { if (loc.live) loc.collections = s.totalCollections; });
+      renderLocations();
+    }
+  }).catch(function() {});
+})();
+</script>
+</body>
+</html>

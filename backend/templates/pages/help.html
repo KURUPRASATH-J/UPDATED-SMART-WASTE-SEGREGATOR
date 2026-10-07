@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" sizes="32x32" href="/frontend/assets/images/favicon-32x32.png?v=1">
+<link rel="icon" type="image/png" sizes="16x16" href="/frontend/assets/images/favicon-16x16.png?v=1">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo.png?v=1" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo-dark.png?v=1" media="(prefers-color-scheme: dark)">
+<link rel="shortcut icon" href="/frontend/assets/images/favicon.ico?v=1">
+<link rel="apple-touch-icon" sizes="180x180" href="/frontend/assets/images/apple-touch-icon.png?v=1">
+<meta name="theme-color" content="#091020">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Help - Smart Waste Segregator</title>
+<link rel="stylesheet" href="/frontend/shared/css/themes.css">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="/frontend/shared/js/emailjs-config.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 100px 20px 40px 20px;
+}
+
+.help-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+}
+
+.search-box {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: 15px;
+  padding: 15px 20px;
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-box input {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1rem;
+  outline: none;
+}
+
+.search-box input::placeholder {
+  color: var(--text-secondary);
+}
+
+.faq-section {
+  margin-bottom: 40px;
+}
+
+.faq-section h2 {
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+  color: var(--accent-primary);
+}
+
+.faq-item {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: 15px;
+  margin-bottom: 15px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.faq-question {
+  padding: 20px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.faq-question:hover {
+  background: var(--bg-secondary);
+}
+
+.faq-question .icon {
+  transition: transform 0.3s ease;
+}
+
+.faq-item.active .icon {
+  transform: rotate(180deg);
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  padding: 0 20px;
+}
+
+.faq-item.active .faq-answer {
+  max-height: 500px;
+  padding: 0 20px 20px 20px;
+}
+
+.faq-answer p {
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+.contact-section {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+}
+
+.contact-section h2 {
+  margin-bottom: 20px;
+  color: var(--accent-primary);
+}
+
+.contact-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+.contact-btn {
+  padding: 12px 30px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.contact-btn:hover {
+  background: rgba(0, 212, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.video-tutorials {
+  margin-bottom: 40px;
+}
+
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.video-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: 15px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.video-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+}
+
+.video-thumbnail {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  background: linear-gradient(135deg, #00d4ff, #00ff99);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+}
+
+.video-info {
+  padding: 20px;
+}
+
+.video-info h3 {
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.video-info p {
+  opacity: 0.8;
+  font-size: 0.9rem;
+}
+
+.video-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.video-thumb-fallback {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.video-play-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.video-play-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.video-card:hover .video-play-btn {
+  background: rgba(0, 212, 255, 0.9);
+  transform: scale(1.08);
+}
+
+.video-play-btn::after {
+  content: '';
+  border-left: 17px solid #fff;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  margin-left: 4px;
+}
+
+/* Email support form */
+.email-support-section {
+  text-align: left;
+}
+
+.email-support-form {
+  margin-top: 25px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-primary);
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: rgba(0, 212, 255, 0.55);
+}
+
+.form-group select option {
+  color: #111;
+  background: #fff;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 26px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #00d4ff, #00ff88);
+  color: #0a0e1a;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 212, 255, 0.35);
+}
+
+.btn-primary:disabled {
+  opacity: 0.65;
+  cursor: default;
+  transform: none;
+}
+
+.btn-secondary {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background: rgba(0, 212, 255, 0.2);
+}
+
+.form-status {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+}
+
+.form-status.error {
+  background: rgba(255, 71, 87, 0.12);
+  border: 1px solid rgba(255, 71, 87, 0.35);
+  color: var(--danger);
+}
+
+.email-support-success {
+  text-align: center;
+  padding: 30px 15px;
+}
+
+.email-support-success .success-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+.email-support-success h3 {
+  margin-bottom: 8px;
+  color: var(--success);
+}
+
+.email-support-success p {
+  margin-bottom: 20px;
+  opacity: 0.85;
+}
+
+@media (max-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Video player modal (native <video> for local files, <iframe> for embeds) */
+.video-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.88);
+  backdrop-filter: blur(12px);
+  z-index: 1200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.video-modal.open {
+  display: flex;
+}
+
+.video-modal-box {
+  background: rgba(12, 16, 30, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-radius: 18px;
+  padding: 18px;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: 0 20px 60px rgba(0, 212, 255, 0.25);
+  animation: fadeInUp 0.3s ease;
+}
+
+.video-modal-box h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.video-modal-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.video-modal-close:hover {
+  color: #ff6b6b;
+}
+
+.video-player-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.video-player-wrap video,
+.video-player-wrap iframe {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border: 0;
+}
+
+.video-fallback {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+  padding: 20px;
+}
+
+.video-fallback span {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  word-break: break-all;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 80px 20px 40px 20px;
+  }
+}
+
+/* Sidebar */
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none;}
+.sidebar{position:fixed;left:0;top:0;height:100%;width:260px;background:var(--bg-card);backdrop-filter:blur(20px);border-right:1px solid var(--border-color);padding:20px 12px;z-index:1000;transform:translateX(-100%);transition:transform 0.35s cubic-bezier(.4,0,.2,1);overflow-y:auto;}
+.sidebar.active{transform:translateX(0);}
+.close-btn{position:absolute;top:18px;right:14px;background:none;border:none;color:var(--text-secondary);font-size:1.5rem;cursor:pointer;transition:color 0.2s;}
+.close-btn:hover{color:#ff6b6b;}
+.nav-links{list-style:none;}
+.nav-links li{margin-bottom:1px;}
+.nav-links a{display:flex;align-items:center;gap:10px;padding:10px 14px;color:var(--text-secondary);text-decoration:none;border-radius:10px;transition:all 0.2s;font-size:0.88rem;}
+.nav-links a:hover{background:var(--bg-secondary);color:var(--text-primary);}
+.nav-links a.active{background:linear-gradient(135deg,rgba(0,212,255,0.12),rgba(0,255,136,0.06));color:var(--accent-primary);font-weight:500;border-left:3px solid var(--accent-primary);}
+.nav-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:8px;flex-shrink:0;}
+.hamburger{position:fixed;top:18px;left:18px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-primary);font-size:1.3rem;padding:7px 11px;border-radius:8px;cursor:pointer;z-index:999;backdrop-filter:blur(10px);transition:background 0.2s;}
+.hamburger:hover{background:var(--bg-secondary);}
+</style>
+</head>
+<body>
+{% include '_sidebar.html' %}
+<div class="help-container">
+  <h1>❓ Help & Support</h1>
+
+  <div class="search-box">
+    <span>🔍</span>
+    <input type="text" placeholder="Search for help..." id="searchInput" onkeyup="searchFAQ()">
+  </div>
+
+  <div class="video-tutorials">
+    <h2 style="margin-bottom: 25px;">📹 Video Tutorials</h2>
+    <div class="video-grid" id="videoGrid"></div>
+  </div>
+
+  <div class="faq-section">
+    <h2>🤔 Frequently Asked Questions</h2>
+
+    <div class="faq-item" onclick="toggleFAQ(this)">
+      <div class="faq-question">
+        <span>How do I set up the system for the first time?</span>
+        <span class="icon">▼</span>
+      </div>
+      <div class="faq-answer">
+        <p>To set up your Smart Waste Segregator: 1) Create an account on the login page, 2) Connect your ESP32 device to WiFi, 3) Configure the Flask server IP in the ESP32 code, 4) Place sensors in your bins, 5) Start monitoring through the dashboard!</p>
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFAQ(this)">
+      <div class="faq-question">
+        <span>What types of waste should go in wet vs dry bins?</span>
+        <span class="icon">▼</span>
+      </div>
+      <div class="faq-answer">
+        <p><strong>Wet Waste:</strong> Food scraps, fruit/vegetable peels, tea bags, coffee grounds, garden waste, cooked food.<br><br><strong>Dry Waste:</strong> Paper, cardboard, plastic bottles, metal cans, glass, textiles, clean packaging materials.</p>
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFAQ(this)">
+      <div class="faq-question">
+        <span>How accurate are the fill level readings?</span>
+        <span class="icon">▼</span>
+      </div>
+      <div class="faq-answer">
+        <p>Our system uses ultrasonic sensors with ±2% accuracy. Combined with IR and moisture sensors, the system provides highly reliable fill level detection. Readings update every 5 seconds for real-time monitoring.</p>
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFAQ(this)">
+      <div class="faq-question">
+        <span>Can I receive notifications when bins are full?</span>
+        <span class="icon">▼</span>
+      </div>
+      <div class="faq-answer">
+        <p>Yes! Enable browser notifications in Settings. You'll receive alerts when bins reach 80% capacity. You can also configure email/SMS notifications for multiple users.</p>
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFAQ(this)">
+      <div class="faq-question">
+        <span>How do I reset my password?</span>
+        <span class="icon">▼</span>
+      </div>
+      <div class="faq-answer">
+        <p>Click "Forgot Password" on the login page, enter your email address, and you'll receive a password reset link. Follow the link to create a new password.</p>
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFAQ(this)">
+      <div class="faq-question">
+        <span>What do the environmental impact numbers mean?</span>
+        <span class="icon">▼</span>
+      </div>
+      <div class="faq-answer">
+        <p>Impact metrics show your contribution to sustainability: CO₂ saved (carbon emissions prevented), Trees equivalent (trees that would be needed to offset your waste), Water saved (conservation through recycling), Energy saved (power conserved through proper waste management).</p>
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFAQ(this)">
+      <div class="faq-question">
+        <span>How do I earn points and badges?</span>
+        <span class="icon">▼</span>
+      </div>
+      <div class="faq-answer">
+        <p>Earn points by: Regular bin emptying (10 pts), Maintaining daily streaks (10 pts/day), Proper waste segregation (5 pts), Timely collections before 90% full (20 pts). Badges are unlocked by achieving specific milestones!</p>
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFAQ(this)">
+      <div class="faq-question">
+        <span>Can I manage multiple bins/locations?</span>
+        <span class="icon">▼</span>
+      </div>
+      <div class="faq-answer">
+        <p>Yes! Upgrade to multi-location mode in Settings. You can add unlimited bins across different buildings, floors, or areas. Each location has separate analytics and can be assigned to different users.</p>
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFAQ(this)">
+      <div class="faq-question">
+        <span>What browsers are supported?</span>
+        <span class="icon">▼</span>
+      </div>
+      <div class="faq-answer">
+        <p>The system works on all modern browsers: Chrome, Firefox, Safari, Edge (latest versions). For best experience, use Chrome or Firefox. Mobile browsers are fully supported. The app is also installable as a PWA.</p>
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFAQ(this)">
+      <div class="faq-question">
+        <span>How do I export my data?</span>
+        <span class="icon">▼</span>
+      </div>
+      <div class="faq-answer">
+        <p>Go to Reports page, select date range and format (PDF/CSV/Excel), then click Generate Report. You can download, print, or email reports directly from the page.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="contact-section email-support-section">
+    <h2>📧 Email Support</h2>
+    <p>Can't find what you need? Send us a message and we'll get back to you soon.</p>
+    <form id="emailSupportForm" class="email-support-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="from_name">Your Name</label>
+          <input type="text" id="from_name" name="from_name" required>
+        </div>
+        <div class="form-group">
+          <label for="from_email">Your Email</label>
+          <input type="email" id="from_email" name="from_email" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="subject">Subject</label>
+        <input type="text" id="subject" name="subject" required>
+      </div>
+      <div class="form-group">
+        <label for="priority">Priority</label>
+        <select id="priority" name="priority" class="styled-select">
+          <option value="Low">Low</option>
+          <option value="Normal" selected>Normal</option>
+          <option value="High">High</option>
+          <option value="Urgent">Urgent</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="5" required></textarea>
+      </div>
+      <input type="hidden" id="sent_date" name="sent_date" value="">
+      <button type="submit" class="btn btn-primary" id="emailSupportSubmit">📨 Send Message</button>
+      <div class="form-status" id="emailSupportStatus" hidden></div>
+    </form>
+    <div id="emailSupportSuccess" class="email-support-success" hidden>
+      <div class="success-icon">✅</div>
+      <h3>Message sent!</h3>
+      <p>Your message has been sent, we'll get back to you soon.</p>
+      <button type="button" class="btn btn-secondary" id="emailSupportReset">Send another message</button>
+    </div>
+  </div>
+
+  <div class="contact-section">
+    <h2>Still Need Help?</h2>
+    <p>Our support team is here to assist you</p>
+    <div class="contact-buttons">
+      <a href="mailto:support@wastesegregator.com" class="contact-btn">📧 Email Support</a>
+      <a href="#" class="contact-btn">💬 Live Chat</a>
+      <a href="#" class="contact-btn">📞 Call Us</a>
+      <a href="#" class="contact-btn">📚 Documentation</a>
+    </div>
+  </div>
+</div>
+
+<div class="video-modal" id="videoModal">
+  <div class="video-modal-box">
+    <h3 id="videoModalTitle"></h3>
+    <div class="video-player-wrap" id="videoPlayerWrap"></div>
+  </div>
+</div>
+
+<script>
+// ============ VIDEO TUTORIALS ============
+// One entry per video. To add a video later, add one object here — no markup
+// edits needed:
+//   { "type": "file",   "title": "...", "description": "...", "src": "/assets/videos/<file>.mp4", "thumbnail": "" }
+//   { "type": "youtube", "title": "...", "description": "...", "src": "https://www.youtube.com/embed/<VIDEO_ID>", "thumbnail": "" }
+// Local files are served from  frontend/assets/videos/  ->  /assets/videos/<file>.
+// "thumbnail" is a local image URL (SVG/PNG/JPG). Cards without a thumbnail show
+// a themed gradient + ▶️ fallback; every card gets the circular play-button overlay.
+
+function escHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+var VIDEOS = [
+  { "type": "file", "title": "Getting Started", "description": "Learn the basics of using the Smart Waste Segregator system", "src": "/assets/videos/getting-started.mp4", "thumbnail": "/assets/images/video-thumbnails/getting-started.svg" },
+  { "type": "file", "title": "Proper Waste Segregation", "description": "Best practices for separating wet and dry waste", "src": "/assets/videos/waste-segregation.mp4", "thumbnail": "/assets/images/video-thumbnails/proper-segregation.svg" },
+  { "type": "file", "title": "Understanding Analytics", "description": "How to read and interpret your waste management data", "src": "/assets/videos/analytics-tour.mp4", "thumbnail": "/assets/images/video-thumbnails/understanding-analytics.svg" }
+];
+
+function renderVideos() {
+  var grid = document.getElementById('videoGrid');
+  grid.innerHTML = VIDEOS.map(function(v, i) {
+    var thumb = v.thumbnail
+      ? '<img src="' + escHtml(v.thumbnail) + '" alt="' + escHtml(v.title) + ' thumbnail">'
+      : '<div class="video-thumb-fallback">▶️</div>';
+    var overlay = '<div class="video-play-overlay"><span class="video-play-btn" aria-hidden="true"></span></div>';
+    return '<div class="video-card" onclick="openVideo(' + i + ')">' +
+      '<div class="video-thumbnail">' + thumb + overlay + '</div>' +
+      '<div class="video-info"><h3>' + escHtml(v.title) + '</h3><p>' + escHtml(v.description) + '</p></div>' +
+      '</div>';
+  }).join('');
+}
+
+function openVideo(index) {
+  var v = VIDEOS[index];
+  if (!v) return;
+  document.getElementById('videoModalTitle').innerHTML =
+    escHtml(v.title) +
+    '<button class="video-modal-close" onclick="closeVideo()" aria-label="Close">✕</button>';
+  var wrap = document.getElementById('videoPlayerWrap');
+  wrap.innerHTML = '';
+
+  if (v.type === 'youtube') {
+    wrap.innerHTML = '<iframe src="' + escHtml(v.src) + '?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+  } else {
+    var vid = document.createElement('video');
+    vid.controls = true;
+    vid.autoplay = true;
+    vid.playsInline = true;
+    vid.preload = 'metadata';
+    vid.src = v.src;
+    if (v.thumbnail) vid.poster = v.thumbnail;
+    vid.onerror = function() {
+      // File not dropped into frontend/assets/videos/ yet — show a hint.
+      wrap.innerHTML = '<div class="video-fallback">🎬 Video coming soon<br><span>' +
+        escHtml(v.src) + '</span></div>';
+    };
+    wrap.appendChild(vid);
+  }
+  document.getElementById('videoModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeVideo() {
+  var wrap = document.getElementById('videoPlayerWrap');
+  var vid = wrap.querySelector('video');
+  if (vid) vid.pause();
+  wrap.innerHTML = '';
+  document.getElementById('videoModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('videoModal').addEventListener('click', function(e) {
+  if (e.target === this) closeVideo();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeVideo();
+});
+
+function toggleFAQ(element) {
+  element.classList.toggle('active');
+}
+
+function searchFAQ() {
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  const faqItems = document.querySelectorAll('.faq-item');
+  
+  faqItems.forEach(item => {
+    const text = item.textContent.toLowerCase();
+    if (text.includes(searchTerm)) {
+      item.style.display = 'block';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+}
+
+// ============ EMAIL SUPPORT (EmailJS) ============
+// Config (service id, public key, template id) lives in ONE place:
+// /frontend/shared/js/emailjs-config.js — shared with the chatbot widget.
+// 🔴 Until window.EMAILJS_CONFIG.TEMPLATE_ID is the real Template ID
+// (EmailJS dashboard → Email Templates), the guard below blocks the send.
+if (window.emailjs) {
+  emailjs.init(window.EMAILJS_CONFIG.PUBLIC_KEY);
+}
+
+document.getElementById('emailSupportForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var status = document.getElementById('emailSupportStatus');
+  var submitBtn = document.getElementById('emailSupportSubmit');
+
+  if (!(window.EMAILJS_CONFIG && window.EMAILJS_CONFIG.SERVICE_ID && window.EMAILJS_CONFIG.TEMPLATE_ID)) {
+    status.hidden = false;
+    status.className = 'form-status error';
+    status.textContent = '⚠️ Email support is not configured yet. Please email support@wastesegregator.com directly instead.';
+    return;
+  }
+  if (!window.emailjs) {
+    status.hidden = false;
+    status.className = 'form-status error';
+    status.textContent = '⚠️ Email service failed to load. Please refresh and try again, or email support@wastesegregator.com.';
+    return;
+  }
+
+  // Auto-generate the sent date right before sending (never user-entered).
+  document.getElementById('sent_date').value = new Date().toLocaleString();
+
+  submitBtn.disabled = true;
+  var originalText = submitBtn.textContent;
+  submitBtn.textContent = '⏳ Sending...';
+  status.hidden = true;
+
+  emailjs.sendForm(window.EMAILJS_CONFIG.SERVICE_ID, window.EMAILJS_CONFIG.TEMPLATE_ID, this)
+    .then(function () {
+      document.getElementById('emailSupportForm').hidden = true;
+      document.getElementById('emailSupportSuccess').hidden = false;
+    })
+    .catch(function (err) {
+      status.hidden = false;
+      status.className = 'form-status error';
+      status.textContent = '❌ Something went wrong sending your message (' +
+        ((err && err.text) || 'unknown error') +
+        '). Please try again, or email support@wastesegregator.com.';
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    });
+});
+
+document.getElementById('emailSupportReset').addEventListener('click', function () {
+  var form = document.getElementById('emailSupportForm');
+  form.reset();
+  document.getElementById('priority').value = 'Normal';
+  form.hidden = false;
+  document.getElementById('emailSupportSuccess').hidden = true;
+  document.getElementById('emailSupportSubmit').textContent = '📨 Send Message';
+});
+
+renderVideos();
+</script>
+
+<script type="module" src="/frontend/shared/js/theme-switcher.js"></script>
+</body>
+</html>

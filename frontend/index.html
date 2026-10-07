@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" sizes="32x32" href="/frontend/assets/images/favicon-32x32.png?v=1">
+<link rel="icon" type="image/png" sizes="16x16" href="/frontend/assets/images/favicon-16x16.png?v=1">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo.png?v=1" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo-dark.png?v=1" media="(prefers-color-scheme: dark)">
+<link rel="shortcut icon" href="/frontend/assets/images/favicon.ico?v=1">
+<link rel="apple-touch-icon" sizes="180x180" href="/frontend/assets/images/apple-touch-icon.png?v=1">
+<meta name="theme-color" content="#091020">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - Smart Waste Segregator</title>
+<link rel="stylesheet" href="/frontend/shared/css/themes.css">
+<link rel="stylesheet" href="/frontend/shared/css/login-loader.css">
+<link rel="preload" as="image" href="/frontend/assets/images/loader-bg.jpg">
+<script src="/frontend/shared/js/login-loader.js" defer></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{min-height:100vh;background:var(--bg-primary);font-family:"Poppins",sans-serif;color:var(--text-primary);display:flex;align-items:center;justify-content:center;overflow-x:hidden;}
+
+.login-box{width:100%;max-width:420px;padding:40px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:24px;backdrop-filter:blur(20px);margin:40px 20px;position:relative;z-index:2;}
+.logo{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:30px;}
+.logo-icon{width:56px;height:56px;border-radius:16px;object-fit:cover;flex-shrink:0;}
+.logo-text h1{font-size:1.3rem;font-weight:700;color:var(--text-primary);}
+.logo-text p{font-size:0.75rem;color:var(--text-secondary);}
+.welcome{text-align:center;margin-bottom:28px;}
+.welcome h2{font-size:1.4rem;font-weight:600;margin-bottom:4px;}
+.welcome p{font-size:0.85rem;color:var(--text-secondary);}
+
+.form-group{margin-bottom:18px;}
+.form-group label{display:block;font-size:0.8rem;font-weight:500;color:var(--text-secondary);margin-bottom:6px;}
+.form-group input{width:100%;padding:13px 16px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:12px;color:var(--text-primary);font-family:inherit;font-size:0.92rem;transition:all 0.3s;outline:none;}
+.form-group input:focus{border-color:var(--accent-primary);box-shadow:var(--glow);}
+.form-group input::placeholder{color:var(--text-secondary);}
+
+.btn{width:100%;padding:14px;border:none;border-radius:12px;font-family:inherit;font-size:0.95rem;font-weight:600;cursor:pointer;transition:all 0.3s;}
+.btn-primary{background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));color:#0a0e1a;margin-bottom:12px;}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,212,255,0.25);}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.btn-ghost{width:100%;padding:11px;border:1px solid var(--border-color);border-radius:12px;background:transparent;color:var(--text-secondary);font-family:inherit;font-size:0.85rem;font-weight:500;cursor:pointer;transition:all 0.25s;}
+.btn-ghost:hover{color:var(--text-primary);border-color:var(--accent-primary);}
+
+.auth-tabs{display:flex;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:12px;padding:4px;margin-bottom:22px;gap:4px;}
+.auth-tab{flex:1;padding:10px 6px;border:none;background:none;color:var(--text-secondary);font-family:inherit;font-size:0.85rem;font-weight:600;border-radius:9px;cursor:pointer;transition:all 0.25s;}
+.auth-tab:hover{color:var(--text-primary);}
+.auth-tab.active{background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));color:#0a0e1a;}
+.admin-note{display:none;text-align:center;font-size:0.72rem;color:var(--warning);margin:-10px 0 18px;background:color-mix(in srgb,var(--warning) 6%,transparent);border:1px solid color-mix(in srgb,var(--warning) 22%,transparent);padding:8px 10px;border-radius:10px;line-height:1.5;}
+.admin-note.show{display:block;}
+
+/* ---- admin math challenge (admin tab only) ---- */
+.challenge-box{display:none;margin-bottom:18px;padding:14px 16px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:14px;}
+.challenge-box.show{display:block;}
+.challenge-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.challenge-q{flex:1;font-size:0.92rem;font-weight:600;color:var(--text-primary);letter-spacing:0.02em;}
+.challenge-q.loading{color:var(--text-secondary);font-weight:400;font-style:italic;}
+.challenge-refresh{flex:0 0 auto;width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--bg-card);border:1px solid var(--border-color);border-radius:9px;color:var(--text-secondary);cursor:pointer;font-size:1rem;line-height:1;transition:all 0.25s;}
+.challenge-refresh:hover:not(:disabled){color:var(--accent-primary);border-color:var(--accent-primary);transform:rotate(-90deg);}
+.challenge-refresh:disabled{opacity:0.45;cursor:not-allowed;}
+.challenge-refresh:focus-visible{outline:2px solid var(--accent-primary);outline-offset:2px;}
+.challenge-box .form-group{margin-bottom:0;}
+.challenge-box input[type=number]{-moz-appearance:textfield;appearance:textfield;}
+.challenge-box input[type=number]::-webkit-outer-spin-button,
+.challenge-box input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.challenge-hint{font-size:0.72rem;color:var(--text-secondary);margin-top:8px;line-height:1.45;}
+
+/* ---- forced / voluntary password change dialog ---- */
+.pw-modal{position:fixed;inset:0;background:rgba(2,6,18,.84);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:100001;padding:20px;}
+.pw-modal.show{display:flex;}
+.pw-card{width:100%;max-width:420px;max-height:92vh;overflow-y:auto;background:var(--bg-card);border:1px solid var(--border-color);border-radius:20px;padding:28px;box-shadow:0 24px 60px rgba(0,0,0,.55);}
+.pw-card h3{font-size:1.15rem;font-weight:600;margin-bottom:6px;}
+.pw-card .pw-sub{font-size:0.8rem;color:var(--text-secondary);margin-bottom:18px;line-height:1.55;}
+.pw-req{list-style:none;margin:0 0 18px;padding:12px 14px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:12px;font-size:0.76rem;color:var(--text-secondary);line-height:1.9;}
+.pw-req li::before{content:"○";margin-right:8px;color:var(--text-secondary);}
+.pw-req li.ok{color:var(--success);}
+.pw-req li.ok::before{content:"●";color:var(--success);}
+
+.error{background:color-mix(in srgb,var(--danger) 9%,transparent);border:1px solid color-mix(in srgb,var(--danger) 22%,transparent);color:var(--danger);padding:10px 14px;border-radius:10px;font-size:0.82rem;margin-bottom:14px;display:none;}
+.success{background:color-mix(in srgb,var(--success) 9%,transparent);border:1px solid color-mix(in srgb,var(--success) 22%,transparent);color:var(--success);padding:10px 14px;border-radius:10px;font-size:0.82rem;margin-bottom:14px;display:none;}
+
+.links{text-align:center;margin-top:18px;font-size:0.82rem;color:var(--text-secondary);}
+.links a{color:var(--accent-primary);text-decoration:none;font-weight:500;}
+.links a:hover{text-decoration:underline;}
+
+.particle{position:fixed;background:color-mix(in srgb,var(--accent-primary) 18%,transparent);border-radius:50%;pointer-events:none;animation:pfloat 12s linear infinite;}
+@keyframes pfloat{0%{transform:translateY(0) scale(1);opacity:0.4;}50%{transform:translateY(-60px) scale(1.2);opacity:0.7;}100%{transform:translateY(0) scale(1);opacity:0.3;}}
+</style>
+<script type="module" src="/frontend/shared/js/pwa.js"></script>
+</head>
+<body>
+
+<div class="login-box">
+  <div class="logo">
+    <img class="logo-icon brand-logo-light" src="/frontend/assets/images/logo.png" alt="Smart Waste Segregator logo" width="56" height="56">
+    <img class="logo-icon brand-logo-dark" src="/frontend/assets/images/logo-dark.png" alt="Smart Waste Segregator logo" width="56" height="56">
+    <div class="logo-text">
+      <h1>Smart Waste Segregator</h1>
+      <p>Monitoring System</p>
+    </div>
+  </div>
+
+  <div class="welcome">
+    <h2>Welcome Back</h2>
+    <p>Sign in to your account</p>
+  </div>
+
+  <div class="error" id="error"></div>
+  <div class="success" id="success"></div>
+
+  <div class="auth-tabs" role="tablist" aria-label="Login type">
+    <button type="button" class="auth-tab active" id="tabUser" role="tab" aria-selected="true">👤 User Login</button>
+    <button type="button" class="auth-tab" id="tabAdmin" role="tab" aria-selected="false">🛡️ Admin Login</button>
+  </div>
+  <div class="admin-note" id="adminNote"></div>
+
+  <form id="loginForm" onsubmit="return handleLogin(event)">
+    <div class="form-group">
+      <label>Username or Email</label>
+      <input type="text" id="username" placeholder="Enter username or email" required autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="Enter password" required autocomplete="current-password">
+    </div>
+
+    <!-- Admin-only math challenge. Hidden entirely on the User tab, and the
+         answer is never sent to /api/auth/admin-challenge (only the id + text). -->
+    <div class="challenge-box" id="challengeBox">
+      <div class="challenge-head">
+        <span class="challenge-q" id="challengeQ" role="status" aria-live="polite">Loading question…</span>
+        <button type="button" class="challenge-refresh" id="challengeRefresh"
+                title="New question" aria-label="Get a new question">↻</button>
+      </div>
+      <div class="form-group">
+        <label for="challengeAnswer">Security answer</label>
+        <input type="number" id="challengeAnswer" inputmode="numeric" autocomplete="off"
+               placeholder="Enter the number" aria-describedby="challengeHint">
+      </div>
+      <p class="challenge-hint" id="challengeHint">Answer correctly to continue. One question per attempt.</p>
+    </div>
+
+    <button type="submit" class="btn btn-primary" id="loginBtn">Sign In</button>
+  </form>
+
+  <div class="links">
+    Don't have an account? <a href="register.html">Create one</a>
+  </div>
+</div>
+
+<!-- Password change dialog: forced on first admin login (seeded default
+     password) and available on demand afterwards. -->
+<div class="pw-modal" id="pwModal" role="dialog" aria-modal="true" aria-labelledby="pwTitle">
+  <div class="pw-card">
+    <h3 id="pwTitle">Set a new password</h3>
+    <p class="pw-sub" id="pwSub">This account is still using its default password. Choose a strong one to open the admin portal.</p>
+    <div class="error" id="pwError"></div>
+    <div class="form-group">
+      <label for="pwCurrent">Current password</label>
+      <input type="password" id="pwCurrent" autocomplete="current-password">
+    </div>
+    <div class="form-group">
+      <label for="pwNew">New password</label>
+      <input type="password" id="pwNew" autocomplete="new-password">
+    </div>
+    <div class="form-group">
+      <label for="pwConfirm">Confirm new password</label>
+      <input type="password" id="pwConfirm" autocomplete="new-password">
+    </div>
+    <ul class="pw-req" id="pwReq">
+      <li data-rule="len">At least 10 characters</li>
+      <li data-rule="mix">A letter and a number</li>
+      <li data-rule="weak">Not a common password</li>
+      <li data-rule="name">Does not contain your username</li>
+    </ul>
+    <button type="button" class="btn btn-primary" id="pwSave">Update password</button>
+    <button type="button" class="btn btn-ghost" id="pwCancel">Cancel</button>
+  </div>
+</div>
+
+<script>
+// Particles
+for(var i=0;i<15;i++){var p=document.createElement('div');p.className='particle';var s=2+Math.random()*5;p.style.cssText='width:'+s+'px;height:'+s+'px;left:'+Math.random()*100+'vw;top:'+Math.random()*100+'vh;animation-duration:'+(8+Math.random()*10)+'s;animation-delay:'+Math.random()*5+'s;';document.body.appendChild(p);}
+
+// Auth-type tabs. The tab is no longer cosmetic: it is sent as `portal` and the
+// SERVER decides whether the account may use that portal. The client never
+// trusts the returned role to pick a destination on its own.
+var activePortal = 'user';
+
+function switchTab(admin) {
+  activePortal = admin ? 'admin' : 'user';
+  document.getElementById('tabUser').classList.toggle('active', !admin);
+  document.getElementById('tabAdmin').classList.toggle('active', admin);
+  document.getElementById('tabUser').setAttribute('aria-selected', String(!admin));
+  document.getElementById('tabAdmin').setAttribute('aria-selected', String(admin));
+  var note = document.getElementById('adminNote');
+  var box = document.getElementById('challengeBox');
+  hideError();
+  if (admin) {
+    note.textContent = '🛡️ Admin accounts only. Standard accounts must use the User Login tab.';
+    note.classList.add('show');
+    box.classList.add('show');
+    fetchChallenge();                       // fresh question every time Admin is selected
+  } else {
+    note.textContent = '';
+    note.classList.remove('show');
+    box.classList.remove('show');
+    challengeId = null;                     // never carry an admin question across to the user tab
+    var ans = document.getElementById('challengeAnswer');
+    if (ans) ans.value = '';
+  }
+}
+document.getElementById('tabUser').addEventListener('click', function(){ switchTab(false); });
+document.getElementById('tabAdmin').addEventListener('click', function(){ switchTab(true); });
+
+// ---- admin math challenge -------------------------------------------------
+var challengeId = null;
+
+function setChallengeUi(text, loading) {
+  var q = document.getElementById('challengeQ');
+  q.textContent = text;
+  q.classList.toggle('loading', !!loading);
+}
+
+function fetchChallenge() {
+  challengeId = null;
+  setChallengeUi('Loading question…', true);
+  var refresh = document.getElementById('challengeRefresh');
+  if (refresh) refresh.disabled = true;
+
+  fetch('/api/auth/admin-challenge', { credentials: 'include' })
+    .then(function(res) {
+      return res.json().then(function(j) { return { ok: res.ok, data: j }; });
+    })
+    .then(function(res) {
+      if (!res.ok) {
+        setChallengeUi('Could not load a question — try again', false);
+        showError(res.data.error || 'Could not load the security question.');
+        return;
+      }
+      challengeId = res.data.challenge_id;
+      setChallengeUi(res.data.question, false);
+      var ans = document.getElementById('challengeAnswer');
+      if (ans) { ans.value = ''; ans.focus(); }   // focus after the question loads
+    })
+    .catch(function() {
+      setChallengeUi('Could not load a question — try again', false);
+      showError('Server not reachable. Make sure Flask is running.');
+    })
+    .then(function() {
+      if (refresh) refresh.disabled = false;
+    });
+}
+
+document.getElementById('challengeRefresh').addEventListener('click', fetchChallenge);
+
+// ---- shared error helper --------------------------------------------------
+function showError(msg) {
+  var el = document.getElementById('error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideError() {
+  var el = document.getElementById('error');
+  el.style.display = 'none';
+  el.textContent = '';
+}
+
+var loginInFlight = false;
+
+function handleLogin(e) {
+  e.preventDefault();
+  if (loginInFlight) return false; // hard guard: a disabled button alone doesn't stop every submit path
+  var errorEl = document.getElementById('error');
+  var successEl = document.getElementById('success');
+  var btn = document.getElementById('loginBtn');
+  var pwInput = document.getElementById('password');
+  var ansInput = document.getElementById('challengeAnswer');
+
+  errorEl.style.display = 'none';
+  successEl.style.display = 'none';
+  loginInFlight = true;
+  btn.disabled = true;
+  btn.textContent = 'Signing in...';
+
+  var data = {
+    username: document.getElementById('username').value.trim(),
+    password: pwInput.value,
+    portal: activePortal
+  };
+  // Only the admin portal needs (and accepts) the challenge pair.
+  if (activePortal === 'admin') {
+    if (!challengeId || !ansInput.value.trim()) {
+      loginInFlight = false;
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+      showError('Answer the security question to continue.');
+      ansInput.focus();
+      return false;
+    }
+    data.challenge_id = challengeId;
+    data.challenge_answer = ansInput.value.trim();
+  }
+
+  fetch('/api/auth/login', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(data),
+    credentials: 'include'
+  })
+  .then(function(res) { return res.json().then(function(j) { return {ok: res.ok, status: res.status, data: j}; }); })
+  .then(function(res) {
+    if (res.ok) {
+      // Loader starts only here -- after a fully successful, server-approved login.
+      var user = res.data.user || {};
+      try { localStorage.setItem('user', JSON.stringify(user)); } catch (e) {}
+      window.showLoginLoader({
+        user: user,
+        admin: user.role === 'admin',
+        // Destination follows the tab the user signed in on. The server has
+        // already verified the account belongs to that portal, so this cannot
+        // route someone into the wrong one.
+        dest: activePortal === 'admin' ? '/admin.html' : '/dashboard.html'
+      });
+      return;
+    }
+
+    loginInFlight = false;
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+
+    // 403 portal mismatch: show the generic server text only. Telling the user
+    // "use the other tab" would leak whether the account is an admin.
+    if (res.status === 403 && res.data.mustChangePassword) {
+      // Hint from what was typed: localStorage is not populated yet, because
+      // this login is deliberately not treated as a success.
+      openPasswordModal(true, document.getElementById('username').value.trim() || user_hint());
+      return;
+    }
+    if (res.status === 403) {
+      showError(res.data.error || 'These credentials can\'t be used on this portal');
+      pwInput.value = '';                   // clear the password on a portal mismatch
+      // The server consumes the challenge on every admin attempt, so the one we
+      // just sent is dead regardless of the outcome. Fetch a fresh one or the
+      // next correct attempt would fail on a used challenge.
+      if (activePortal === 'admin') { fetchChallenge(); } else { pwInput.focus(); }
+      return;
+    }
+    // 400 / 429 / 401 all need a fresh question on the admin path: challenges
+    // are single-use, so the old one is already dead either way.
+    showError(res.data.error || 'Login failed');
+    pwInput.value = '';
+    if (activePortal === 'admin') {
+      fetchChallenge();
+    } else {
+      pwInput.focus();
+    }
+  })
+  .catch(function(err) {
+    errorEl.textContent = 'Server not reachable. Make sure Flask is running.';
+    errorEl.style.display = 'block';
+    loginInFlight = false;
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+  });
+
+  return false;
+}
+
+// ---- password change dialog ---------------------------------------------
+function user_hint() {
+  try {
+    var u = JSON.parse(localStorage.getItem('user') || '{}');
+    return u.username || '';
+  } catch (e) { return ''; }
+}
+
+function openPasswordModal(forced, username) {
+  var modal = document.getElementById('pwModal');
+  var cancel = document.getElementById('pwCancel');
+  modal.classList.add('show');
+  // A forced change cannot be dismissed -- the admin portal is unreachable
+  // server-side until the password is replaced.
+  cancel.style.display = forced ? 'none' : '';
+  document.getElementById('pwSub').textContent = forced
+    ? 'This account is still using its default password. Choose a strong one to open the admin portal.'
+    : 'Choose a new password for your account.';
+  document.getElementById('pwError').style.display = 'none';
+  document.getElementById('pwCurrent').focus();
+  updatePwRules(username);
+}
+
+function closePasswordModal() {
+  document.getElementById('pwModal').classList.remove('show');
+}
+
+function updatePwRules(username) {
+  var v = document.getElementById('pwNew').value || '';
+  var low = v.toLowerCase();
+  var rules = {
+    len: v.length >= 10,
+    mix: /[a-z]/i.test(v) && /\d/.test(v),
+    weak: v.length >= 10 && ['admin123','password','1234567890','password123'].indexOf(low) === -1,
+    name: !(username && username.length >= 4 && low.indexOf(String(username).toLowerCase()) !== -1)
+  };
+  Object.keys(rules).forEach(function (k) {
+    var li = document.querySelector('#pwReq li[data-rule="' + k + '"]');
+    if (li) li.classList.toggle('ok', rules[k]);
+  });
+}
+
+document.getElementById('pwNew').addEventListener('input', function() {
+  updatePwRules(user_hint());
+});
+document.getElementById('pwCancel').addEventListener('click', closePasswordModal);
+
+document.getElementById('pwSave').addEventListener('click', function() {
+  var btn = this;
+  var errEl = document.getElementById('pwError');
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+  fetch('/api/auth/change-password', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    credentials: 'include',
+    body: JSON.stringify({
+      current_password: document.getElementById('pwCurrent').value,
+      new_password: document.getElementById('pwNew').value,
+      confirm_password: document.getElementById('pwConfirm').value
+    })
+  })
+  .then(function(res) { return res.json().then(function(j) { return { ok: res.ok, data: j }; }); })
+  .then(function(res) {
+    btn.disabled = false;
+    btn.textContent = 'Update password';
+    if (!res.ok) {
+      errEl.textContent = res.data.error || 'Could not update the password.';
+      errEl.style.display = 'block';
+      return;
+    }
+    closePasswordModal();
+    // Password is now accepted everywhere -> straight into the admin portal.
+    window.location.href = '/admin.html';
+  })
+  .catch(function() {
+    btn.disabled = false;
+    btn.textContent = 'Update password';
+    errEl.textContent = 'Server not reachable. Make sure Flask is running.';
+    errEl.style.display = 'block';
+  });
+});
+
+// Enter inside the dialog submits it, mirroring the login form.
+document.getElementById('pwModal').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') { e.preventDefault(); document.getElementById('pwSave').click(); }
+  if (e.key === 'Escape' && document.getElementById('pwCancel').style.display !== 'none') {
+    closePasswordModal();
+  }
+});
+
+// If the server redirected here because a change is pending, open the dialog.
+(function () {
+  var m = /[?&]change_password=required/.test(location.search);
+  if (m) {
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then(function(r) { return r.json(); })
+      .then(function(j) { if (j && j.mustChangePassword) openPasswordModal(true, user_hint()); })
+      .catch(function() {});
+  }
+})();
+</script>
+<script src="/frontend/shared/js/emailjs-config.js"></script>
+<script src="/frontend/shared/js/chat-widget.js"></script>
+<script type="module" src="/frontend/shared/js/theme-switcher.js"></script>
+</body>
+</html>

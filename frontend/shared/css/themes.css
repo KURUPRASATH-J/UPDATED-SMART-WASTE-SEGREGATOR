@@ -1,0 +1,519 @@
+/* ============================================
+   THEME SYSTEM - Multiple Color Themes
+   ============================================ */
+
+:root {
+  /* Default Dark Theme */
+  --bg-primary: radial-gradient(circle at top, #091020, #020617);
+  --bg-secondary: rgba(255, 255, 255, 0.05);
+  --bg-card: rgba(255, 255, 255, 0.05);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --accent-primary: #00d4ff;
+  --accent-secondary: #00ff99;
+  --shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  --glow: 0 0 20px rgba(0, 212, 255, 0.3);
+  --success: #00ff88;
+  --warning: #ffaa00;
+  --danger: #ff4757;
+  /* Height of the fixed top bar on pages that have one — used to anchor the
+     shared toast container just below it. */
+  --topbar-height: 64px;
+}
+
+/* Light Theme */
+body.theme-light {
+  --bg-primary: radial-gradient(circle at top, #e6f2ff, #cce7ff);
+  --bg-secondary: rgba(255, 255, 255, 0.95);
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --border-color: rgba(0, 0, 0, 0.1);
+  --text-primary: #111111;
+  --text-secondary: rgba(0, 0, 0, 0.7);
+  --accent-primary: #0078ff;
+  --accent-secondary: #00c864;
+  --shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
+  --glow: 0 0 20px rgba(0, 120, 255, 0.3);
+  --success: #008a4d;
+  --warning: #b25e00;
+  --danger: #c62839;
+}
+
+/* Blue Ocean Theme */
+body.theme-ocean {
+  --bg-primary: linear-gradient(135deg, #001f3f 0%, #003d7a 50%, #0066cc 100%);
+  --bg-secondary: rgba(0, 102, 204, 0.15);
+  --bg-card: rgba(0, 102, 204, 0.1);
+  --border-color: rgba(0, 180, 255, 0.3);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.8);
+  --accent-primary: #00b4ff;
+  --accent-secondary: #00e5ff;
+  --shadow: 0 10px 40px rgba(0, 60, 120, 0.6);
+  --glow: 0 0 30px rgba(0, 180, 255, 0.5);
+}
+
+/* Green Nature Theme */
+body.theme-nature {
+  --bg-primary: linear-gradient(135deg, #0a3d0a 0%, #166d16 50%, #22a022 100%);
+  --bg-secondary: rgba(34, 160, 34, 0.15);
+  --bg-card: rgba(34, 160, 34, 0.1);
+  --border-color: rgba(0, 255, 100, 0.3);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.8);
+  --accent-primary: #00ff66;
+  --accent-secondary: #66ff99;
+  --shadow: 0 10px 40px rgba(0, 80, 20, 0.6);
+  --glow: 0 0 30px rgba(0, 255, 100, 0.5);
+}
+
+/* Sunset Theme */
+body.theme-sunset {
+  --bg-primary: linear-gradient(135deg, #1a0a0a 0%, #4d1f1f 50%, #ff6b35 100%);
+  --bg-secondary: rgba(255, 107, 53, 0.15);
+  --bg-card: rgba(255, 107, 53, 0.1);
+  --border-color: rgba(255, 150, 80, 0.3);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.8);
+  --accent-primary: #ff6b35;
+  --accent-secondary: #ffaa00;
+  --shadow: 0 10px 40px rgba(80, 30, 10, 0.6);
+  --glow: 0 0 30px rgba(255, 107, 53, 0.5);
+}
+
+/* Purple Galaxy Theme */
+body.theme-galaxy {
+  --bg-primary: linear-gradient(135deg, #1a0033 0%, #330066 50%, #6600cc 100%);
+  --bg-secondary: rgba(102, 0, 204, 0.15);
+  --bg-card: rgba(102, 0, 204, 0.1);
+  --border-color: rgba(153, 50, 255, 0.3);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.8);
+  --accent-primary: #9932ff;
+  --accent-secondary: #cc66ff;
+  --shadow: 0 10px 40px rgba(50, 0, 100, 0.6);
+  --glow: 0 0 30px rgba(153, 50, 255, 0.5);
+}
+
+/* Apply theme variables */
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: all 0.5s ease;
+}
+
+.sidebar,
+.card,
+.bin,
+.stat-card,
+.settings-section,
+.chart-container {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  box-shadow: var(--shadow);
+}
+
+/* ---------- Top-bar controls (hamburger + sidebar close) ----------
+   ID selectors deliberately out-rank the per-page `.hamburger`/`.close-btn`
+   class rules (which only keep layout/geometry), so this one block themes
+   the toggle on every page at once. The ☰ / × glyphs inherit the text color
+   via the `color` property. */
+#hamburger {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+  box-shadow: var(--shadow);
+}
+#hamburger:hover {
+  background: var(--bg-secondary);
+  border-color: var(--accent-primary);
+}
+#closeSidebar {
+  background: none;
+  color: var(--text-secondary);
+}
+#closeSidebar:hover {
+  color: var(--danger);
+}
+#hamburger:focus-visible,
+#closeSidebar:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.btn-primary,
+.accent-text,
+a:hover {
+  color: var(--accent-primary);
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+}
+
+/* ---------- Sidebar actions: user card + theme card ----------
+   Layout option 1 — "equal two-card layout (with logout)". Two sibling cards
+   in one grid row, equal width/height. The grid auto-stacks them vertically
+   when two cards won't fit (narrow sidebar / small screens). */
+.sidebar-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(214px, 1fr));
+  gap: 10px;
+  margin: 14px 6px 0;
+}
+
+/* Shared card look — same tokens as .stat-card so the pair reads native. */
+.sidebar-user-card,
+.theme-picker {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  min-height: 56px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  min-width: 0;
+}
+
+/* LEFT card: circular avatar + uppercase name + divider + logout */
+.su-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  color: #0a0e1a;
+  font-size: 0.9rem;
+  overflow: hidden;
+}
+.su-avatar .su-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+.su-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.su-divider {
+  align-self: stretch;
+  width: 1px;
+  flex-shrink: 0;
+  background: var(--border-color);
+}
+.su-logout {
+  flex-shrink: 0;
+  height: 32px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  line-height: 1;
+}
+.su-logout:hover {
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.12);
+}
+
+/* RIGHT card: palette icon + "Theme" label left, dropdown right */
+.tc-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.tc-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+.tc-select-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+}
+.tc-select-wrap select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  max-width: 100%;
+  padding: 6px 22px 6px 8px;
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tc-select-wrap::after {
+  content: '▾';
+  position: absolute;
+  right: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  pointer-events: none;
+}
+/* Dropdown list stays readable regardless of theme */
+.tc-select-wrap select option {
+  color: #111;
+  background: #fff;
+}
+
+/* ============================================
+   Project-wide custom <select> dropdown styling
+   Add class="styled-select" to any <select> for a
+   theme-aware chevron, rounded focus glow and a
+   readable (light) dropdown list in every theme.
+   ============================================ */
+body select.styled-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23c3cede' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px;
+  padding-right: 38px;
+  cursor: pointer;
+}
+body.theme-light select.styled-select {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%235b6b82' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+body select.styled-select:hover {
+  border-color: var(--accent-primary);
+}
+body select.styled-select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: var(--glow);
+}
+body select.styled-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+select.styled-select option {
+  color: #111;
+  background: #fff;
+}
+
+/* Animations preference: kill transitions/animations instantly app-wide */
+body.animations-disabled *,
+body.animations-disabled *::before,
+body.animations-disabled *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Forced single-column stack on very small screens */
+@media (max-width: 400px) {
+  .sidebar-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Brand logo: default (dark/ocean/nature/sunset/galaxy) shows logo-dark.png;
+   only the light theme shows logo.png. Both <img>s exist in the markup and
+   this single rule block keeps the swap logic in one shared place. */
+.brand-logo {
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.brand-logo-light {
+  display: none;
+}
+.brand-logo-dark {
+  display: inline-block;
+}
+body.theme-light .brand-logo-light {
+  display: inline-block;
+}
+body.theme-light .brand-logo-dark {
+  display: none;
+}
+
+/* Bin fill percentage: dark text on the light-theme (mid-tone) bin surface */
+body.theme-light .bin-pct {
+  color: var(--text-primary);
+  text-shadow: 0 2px 12px rgba(230, 242, 255, 0.35);
+}
+
+/* ============================================
+   TOASTS (shared) — top-right, below the topbar.
+   Rendered by frontend/shared/js/toast.js on every
+   page; z-index sits above sidebar/topbar/modals and
+   the chat widget, so nothing covers a toast.
+   ============================================ */
+.toast-container {
+  position: fixed;
+  top: calc(var(--topbar-height) + 12px);
+  right: 16px;
+  z-index: 12000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  pointer-events: none; /* the container itself never blocks clicks */
+}
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: fit-content;
+  max-width: 360px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  animation: toastIn 0.35s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+}
+.toast:hover {
+  transform: translateX(-4px);
+}
+.toast.toast-leave {
+  animation: toastOut 0.3s ease forwards;
+}
+.toast-msg {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+.toast-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.toast-action {
+  border: none;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: filter 0.2s, transform 0.2s;
+}
+.toast-action:hover {
+  filter: brightness(1.12);
+}
+.toast-btn-primary {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  color: #0a0e1a;
+}
+.toast-btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+.toast-close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1;
+  padding: 2px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.toast-close:hover {
+  color: var(--danger);
+}
+.toast-success {
+  background: color-mix(in srgb, var(--accent-secondary) 12%, transparent);
+  border-color: color-mix(in srgb, var(--accent-secondary) 32%, transparent);
+}
+.toast-success .toast-msg {
+  color: var(--success);
+}
+.toast-error {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  border-color: color-mix(in srgb, var(--danger) 32%, transparent);
+}
+.toast-error .toast-msg {
+  color: var(--danger);
+}
+.toast-info {
+  background: color-mix(in srgb, var(--accent-primary) 12%, transparent);
+  border-color: color-mix(in srgb, var(--accent-primary) 32%, transparent);
+}
+.toast-info .toast-msg {
+  color: var(--accent-primary);
+}
+.toast-warning {
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
+  border-color: color-mix(in srgb, var(--warning) 32%, transparent);
+}
+.toast-warning .toast-msg {
+  color: var(--warning);
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes toastOut {
+  to { opacity: 0; transform: translateX(100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .toast.toast-leave {
+    animation: none;
+  }
+}
+@media (max-width: 640px) {
+  .toast-container {
+    left: 12px;
+    right: 12px;
+    align-items: stretch;
+  }
+  .toast {
+    width: auto;
+    max-width: none;
+  }
+}

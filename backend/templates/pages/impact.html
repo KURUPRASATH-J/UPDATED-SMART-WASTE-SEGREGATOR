@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" sizes="32x32" href="/frontend/assets/images/favicon-32x32.png?v=1">
+<link rel="icon" type="image/png" sizes="16x16" href="/frontend/assets/images/favicon-16x16.png?v=1">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo.png?v=1" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo-dark.png?v=1" media="(prefers-color-scheme: dark)">
+<link rel="shortcut icon" href="/frontend/assets/images/favicon.ico?v=1">
+<link rel="apple-touch-icon" sizes="180x180" href="/frontend/assets/images/apple-touch-icon.png?v=1">
+<meta name="theme-color" content="#091020">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Environmental Impact - Smart Waste Segregator</title>
+<link rel="stylesheet" href="/frontend/shared/css/themes.css">
+<link rel="stylesheet" href="/frontend/shared/css/animations.css">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 100px 20px 40px 20px;
+}
+
+.impact-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hero-section {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.hero-section h1 {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-section p {
+  font-size: 1.2rem;
+  opacity: 0.8;
+}
+
+.impact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  margin-bottom: 50px;
+}
+
+.impact-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.impact-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 60px rgba(0, 212, 255, 0.3);
+}
+
+.impact-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.impact-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--success);
+  margin: 15px 0;
+}
+
+.impact-label {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.impact-desc {
+  font-size: 0.9rem;
+  opacity: 0.7;
+  margin-top: 10px;
+}
+
+.comparison-section {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 40px;
+  margin-bottom: 40px;
+}
+
+.comparison-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background: var(--bg-card);
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+.comparison-icon {
+  font-size: 3rem;
+  flex-shrink: 0;
+}
+
+.comparison-content {
+  flex: 1;
+}
+
+.comparison-content h4 {
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+}
+
+.comparison-content p {
+  opacity: 0.8;
+  font-size: 0.95rem;
+}
+
+.progress-section {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 40px;
+}
+
+.goal-item {
+  margin-bottom: 30px;
+}
+
+.goal-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.progress-bar {
+  height: 12px;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  border-radius: 10px;
+  transition: width 1s ease;
+}
+
+.tips-section {
+  margin-top: 40px;
+}
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.tip-card {
+  background: color-mix(in srgb, var(--success) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
+  border-radius: 15px;
+  padding: 25px;
+}
+
+.tip-card h4 {
+  color: var(--accent-primary);
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.empty-state {
+  background: var(--bg-card);
+  border: 1px dashed var(--border-color);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  margin-bottom: 40px;
+  opacity: 0.85;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 80px 20px 40px 20px;
+  }
+
+  .hero-section h1 {
+    font-size: 2rem;
+  }
+}
+
+/* Sidebar */
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none;}
+.sidebar{position:fixed;left:0;top:0;height:100%;width:260px;background:var(--bg-card);backdrop-filter:blur(20px);border-right:1px solid var(--border-color);padding:20px 12px;z-index:1000;transform:translateX(-100%);transition:transform 0.35s cubic-bezier(.4,0,.2,1);overflow-y:auto;}
+.sidebar.active{transform:translateX(0);}
+.close-btn{position:absolute;top:18px;right:14px;background:none;border:none;color:var(--text-secondary);font-size:1.5rem;cursor:pointer;transition:color 0.2s;}
+.close-btn:hover{color:#ff6b6b;}
+.nav-links{list-style:none;}
+.nav-links li{margin-bottom:1px;}
+.nav-links a{display:flex;align-items:center;gap:10px;padding:10px 14px;color:var(--text-secondary);text-decoration:none;border-radius:10px;transition:all 0.2s;font-size:0.88rem;}
+.nav-links a:hover{background:var(--bg-secondary);color:var(--text-primary);}
+.nav-links a.active{background:linear-gradient(135deg,rgba(0,212,255,0.12),rgba(0,255,136,0.06));color:var(--accent-primary);font-weight:500;border-left:3px solid var(--accent-primary);}
+.nav-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:8px;flex-shrink:0;}
+.hamburger{position:fixed;top:18px;left:18px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-primary);font-size:1.3rem;padding:7px 11px;border-radius:8px;cursor:pointer;z-index:999;backdrop-filter:blur(10px);transition:background 0.2s;}
+.hamburger:hover{background:var(--bg-secondary);}
+</style>
+</head>
+<body>
+{% include '_sidebar.html' %}
+<div class="impact-container">
+  <div class="hero-section slide-up">
+    <h1>🌍 Environmental Impact</h1>
+    <p>Your contribution to a sustainable future</p>
+  </div>
+
+  <div id="impactEmpty" class="empty-state fade-in-stagger" style="display:none;">
+    <div style="font-size: 3rem; margin-bottom: 12px;">📡</div>
+    <h3 style="margin-bottom: 8px; color: var(--accent-primary);">No sensor data yet</h3>
+    <p>Post your first readings to start tracking trees saved, CO₂ reduced and more.</p>
+  </div>
+
+  <div class="impact-grid fade-in-stagger">
+    <div class="impact-card">
+      <span class="impact-icon">🌳</span>
+      <div class="impact-value" id="treesSaved">…</div>
+      <div class="impact-label">Trees Saved</div>
+      <div class="impact-desc">Equivalent trees planted</div>
+    </div>
+
+    <div class="impact-card">
+      <span class="impact-icon">💨</span>
+      <div class="impact-value" id="co2Reduced">… kg</div>
+      <div class="impact-label">CO₂ Reduced</div>
+      <div class="impact-desc">Carbon emissions prevented</div>
+    </div>
+
+    <div class="impact-card">
+      <span class="impact-icon">💧</span>
+      <div class="impact-value" id="waterSaved">… L</div>
+      <div class="impact-label">Water Saved</div>
+      <div class="impact-desc">Liters of water conserved</div>
+    </div>
+
+    <div class="impact-card">
+      <span class="impact-icon">⚡</span>
+      <div class="impact-value" id="energySaved">… kWh</div>
+      <div class="impact-label">Energy Saved</div>
+      <div class="impact-desc">Kilowatt-hours conserved</div>
+    </div>
+  </div>
+
+  <div class="comparison-section slide-up delay-1">
+    <h2 style="margin-bottom: 25px;">Real-World Comparison</h2>
+
+    <div class="comparison-item">
+      <span class="comparison-icon">🚗</span>
+      <div class="comparison-content">
+        <h4>Driving Distance</h4>
+        <p>Your CO₂ savings equal <strong id="drivingDist">… km</strong> of driving avoided</p>
+      </div>
+    </div>
+
+    <div class="comparison-item">
+      <span class="comparison-icon">💡</span>
+      <div class="comparison-content">
+        <h4>Home Energy</h4>
+        <p>Energy saved could power a home for <strong id="homeDays">… days</strong></p>
+      </div>
+    </div>
+
+    <div class="comparison-item">
+      <span class="comparison-icon">🚿</span>
+      <div class="comparison-content">
+        <h4>Shower Time</h4>
+        <p>Water saved equals <strong id="showerTime">… hours</strong> of shower time</p>
+      </div>
+    </div>
+
+    <div class="comparison-item">
+      <span class="comparison-icon">📱</span>
+      <div class="comparison-content">
+        <h4>Phone Charges</h4>
+        <p>Energy saved could charge a phone <strong id="phoneCharges">… times</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="progress-section slide-up delay-2">
+    <h2 style="margin-bottom: 25px;">🎯 Sustainability Goals</h2>
+
+    <div class="goal-item">
+      <div class="goal-header">
+        <span>Monthly Carbon Reduction Goal</span>
+        <span><strong id="carbonProgress">…</strong> / <span id="carbonGoal">100</span> kg</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="carbonBar" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <div class="goal-item">
+      <div class="goal-header">
+        <span>Waste Diversion Rate</span>
+        <span><strong id="diversionProgress">…</strong>%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="diversionBar" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <div class="goal-item">
+      <div class="goal-header">
+        <span>Water Conservation Target</span>
+        <span><strong id="waterProgress">…</strong> / <span id="waterGoal">1000</span> L</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="waterBar" style="width: 0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tips-section">
+    <h2 style="margin-bottom: 25px;">💡 Eco Tips</h2>
+    <div class="tips-grid">
+      <div class="tip-card">
+        <h4>🍃 Composting</h4>
+        <p>Start composting organic waste to reduce methane emissions and create nutrient-rich soil</p>
+      </div>
+      <div class="tip-card">
+        <h4>♻️ Proper Recycling</h4>
+        <p>Clean and sort recyclables properly to increase processing efficiency by up to 95%</p>
+      </div>
+      <div class="tip-card">
+        <h4>🏠 Waste Reduction</h4>
+        <p>Reduce single-use plastics and buy in bulk to cut packaging waste at the source</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+window.loadImpact = function() {
+  fetch('/api/impact', { credentials: 'include' })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(s) {
+      if (!s) throw new Error('impact endpoint unavailable');
+      var set = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
+
+      set('treesSaved', s.treesSaved);
+      set('co2Reduced', s.co2Reduced + ' kg');
+      set('waterSaved', s.waterSaved + ' L');
+      set('energySaved', s.energySaved + ' kWh');
+      set('drivingDist', s.drivingKm + ' km');
+      set('homeDays', s.homeDays);
+      set('showerTime', s.showerHours + ' h');
+      set('phoneCharges', s.phoneCharges);
+
+      set('carbonProgress', Math.round(s.co2Reduced));
+      set('carbonGoal', s.carbonGoal);
+      var cbar = document.getElementById('carbonBar'); if (cbar) cbar.style.width = s.carbonProgress + '%';
+
+      var div = (typeof s.diversionProgress === 'number') ? s.diversionProgress : null;
+      set('diversionProgress', div != null ? div : '—');
+      var dbar = document.getElementById('diversionBar'); if (dbar) dbar.style.width = (div != null ? div : 0) + '%';
+
+      set('waterProgress', Math.round(s.waterSaved));
+      set('waterGoal', s.waterGoal);
+      var wbar = document.getElementById('waterBar'); if (wbar) wbar.style.width = s.waterProgress + '%';
+
+      var empty = document.getElementById('impactEmpty');
+      if (empty) empty.style.display = (s.totalCollections === 0 && s.readingsCount === 0) ? 'block' : 'none';
+    })
+    .catch(function(e) {
+      console.error('Impact load error:', e);
+      var set = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
+      set('treesSaved', '—');
+      set('co2Reduced', '— kg');
+      set('waterSaved', '— L');
+      set('energySaved', '— kWh');
+    });
+};
+window.loadImpact();
+setInterval(window.loadImpact, 60000);
+</script>
+
+<script type="module" src="/frontend/shared/js/theme-switcher.js"></script>
+</body>
+</html>

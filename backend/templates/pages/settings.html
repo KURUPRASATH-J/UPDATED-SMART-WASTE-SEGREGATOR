@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" sizes="32x32" href="/frontend/assets/images/favicon-32x32.png?v=1">
+<link rel="icon" type="image/png" sizes="16x16" href="/frontend/assets/images/favicon-16x16.png?v=1">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo.png?v=1" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" sizes="192x192" href="/frontend/assets/images/logo-dark.png?v=1" media="(prefers-color-scheme: dark)">
+<link rel="shortcut icon" href="/frontend/assets/images/favicon.ico?v=1">
+<link rel="apple-touch-icon" sizes="180x180" href="/frontend/assets/images/apple-touch-icon.png?v=1">
+<meta name="theme-color" content="#091020">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings - Smart Waste Segregator</title>
+<link rel="stylesheet" href="/frontend/shared/css/themes.css">
+<!-- Animations -->
+<style>
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+.slide-up { animation: slideUp 0.6s ease forwards; }
+</style>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 100px 20px 40px 20px;
+  transition: background 1s ease;
+}
+
+.settings-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+}
+
+.settings-nav {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  background: var(--bg-secondary);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: 15px;
+  padding: 10px;
+}
+
+.nav-tab {
+  padding: 12px 25px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.nav-tab:hover,
+.nav-tab.active {
+  background: color-mix(in srgb, var(--accent-primary) 20%, transparent);
+  transform: translateY(-2px);
+}
+
+.settings-section {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 40px;
+  margin-bottom: 30px;
+  display: none;
+}
+
+.settings-section.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+.settings-section h2 {
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+  color: var(--accent-primary);
+}
+
+.setting-item {
+  margin-bottom: 25px;
+  padding-bottom: 25px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.setting-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.setting-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.setting-description {
+  opacity: 0.8;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.form-group input[type="number"],
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group select {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px 18px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-group select option { color: #111; background: #fff; }
+
+.setting-header select {
+  min-width: 170px;
+  padding: 10px 14px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.general-preview {
+  margin-top: 16px;
+  font-style: italic;
+  opacity: 0.85;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: var(--glow);
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 30px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--text-secondary);
+  transition: 0.4s;
+  border-radius: 30px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 4px;
+  bottom: 4px;
+  background-color: var(--text-primary);
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: var(--accent-primary);
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(30px);
+}
+
+.btn {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-right: 10px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  color: #111;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glow);
+}
+
+.btn-danger {
+  background: #ff4444;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #dd2222;
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background: var(--border-color);
+}
+
+.info-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.info-table tr {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.info-table td {
+  padding: 15px 10px;
+}
+
+.info-table td:first-child {
+  font-weight: 600;
+  width: 200px;
+}
+
+.badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.badge.connected {
+  background: rgba(0, 200, 100, 0.2);
+  color: #00ff99;
+}
+
+code {
+  background: var(--bg-secondary);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+}
+
+.notification-preview {
+  background: color-mix(in srgb, var(--accent-primary) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-primary) 30%, transparent);
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+.theme-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.theme-option {
+  width: auto;
+  height: auto;
+  padding: 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  border: 2px solid transparent;
+  position: relative;
+}
+
+.theme-option:hover {
+  transform: translateY(-5px);
+}
+
+.theme-option.active {
+  border-color: var(--accent-primary);
+  box-shadow: var(--glow);
+}
+
+.theme-option.active::after {
+  content: '✓';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  background: var(--accent-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+}
+
+.theme-dark { background: linear-gradient(135deg, #091020, #1a2a4e); }
+.theme-light-option { background: linear-gradient(135deg, #e6f2ff, #cce7ff); color: #111; }
+.theme-ocean { background: linear-gradient(135deg, #001f3f, #0066cc); }
+.theme-nature { background: linear-gradient(135deg, #0a3d0a, #22a022); }
+.theme-sunset { background: linear-gradient(135deg, #1a0a0a, #ff6b35); }
+.theme-galaxy { background: linear-gradient(135deg, #1a0033, #6600cc); }
+
+@media (max-width: 768px) {
+  body {
+    padding: 80px 20px 40px 20px;
+  }
+  
+  .settings-nav {
+    flex-direction: column;
+  }
+  
+  .nav-tab {
+    width: 100%;
+    text-align: left;
+  }
+  
+  .form-group input,
+  .form-group select {
+    max-width: 100%;
+  }
+}
+
+/* Sidebar */
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none;}
+.sidebar{position:fixed;left:0;top:0;height:100%;width:260px;background:var(--bg-card);backdrop-filter:blur(20px);border-right:1px solid var(--border-color);padding:20px 12px;z-index:1000;transform:translateX(-100%);transition:transform 0.35s cubic-bezier(.4,0,.2,1);overflow-y:auto;}
+.sidebar.active{transform:translateX(0);}
+.close-btn{position:absolute;top:18px;right:14px;background:none;border:none;color:var(--text-secondary);font-size:1.5rem;cursor:pointer;transition:color 0.2s;}
+.close-btn:hover{color:#ff6b6b;}
+.nav-links{list-style:none;}
+.nav-links li{margin-bottom:1px;}
+.nav-links a{display:flex;align-items:center;gap:10px;padding:10px 14px;color:var(--text-secondary);text-decoration:none;border-radius:10px;transition:all 0.2s;font-size:0.88rem;}
+.nav-links a:hover{background:var(--bg-secondary);color:var(--text-primary);}
+.nav-links a.active{background:linear-gradient(135deg,rgba(0,212,255,0.12),rgba(0,255,136,0.06));color:var(--accent-primary);font-weight:500;border-left:3px solid var(--accent-primary);}
+.nav-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:8px;flex-shrink:0;}
+.hamburger{position:fixed;top:18px;left:18px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-primary);font-size:1.3rem;padding:7px 11px;border-radius:8px;cursor:pointer;z-index:999;backdrop-filter:blur(10px);transition:background 0.2s;}
+.hamburger:hover{background:var(--bg-secondary);}
+</style>
+</head>
+<body>
+{% include '_sidebar.html' %}
+<div class="settings-container">
+  <h1 class="slide-up">⚙️ Settings</h1>
+
+  <div class="settings-nav">
+    <button class="nav-tab active" onclick="showSection('general')">🔧 General</button>
+    <button class="nav-tab" onclick="showSection('notifications')">🔔 Notifications</button>
+    <button class="nav-tab" onclick="showSection('appearance')">🎨 Appearance</button>
+    <button class="nav-tab" onclick="showSection('security')">🔐 Security</button>
+  <button class="nav-tab" onclick="showSection('alerts')">⚠️ Alerts</button>
+    <button class="nav-tab" onclick="showSection('system')">💻 System</button>
+    <button class="nav-tab" onclick="showSection('advanced')">🔬 Advanced</button>
+  </div>
+
+  <!-- GENERAL SETTINGS -->
+  <div class="settings-section active" id="general">
+    <h2>General Settings</h2>
+
+    <div class="setting-item">
+      <div class="setting-header">
+        <h3>Language</h3>
+        <select id="language" class="styled-select" onchange="renderGeneralPreview()">
+          <option value="en">English</option>
+          <option value="hi">हिन्दी (Hindi)</option>
+          <option value="es">Español (Spanish)</option>
+          <option value="fr">Français (French)</option>
+        </select>
+      </div>
+      <div class="setting-description">
+        Choose your preferred language for the interface
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-header">
+        <h3>Time Zone</h3>
+        <select id="timezone" class="styled-select" onchange="renderGeneralPreview()">
+          <option value="IST">IST (Asia/Kolkata)</option>
+          <option value="EST">EST (America/New_York)</option>
+          <option value="PST">PST (America/Los_Angeles)</option>
+          <option value="GMT">GMT (Europe/London)</option>
+        </select>
+      </div>
+      <div class="setting-description">
+        Set your local time zone for accurate timestamps
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-header">
+        <h3>Date Format</h3>
+        <select id="dateFormat" class="styled-select" onchange="renderGeneralPreview()">
+          <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+          <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+          <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+        </select>
+      </div>
+      <div class="setting-description">
+        Choose how dates are displayed throughout the app
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-header">
+        <h3>Pickup Schedule</h3>
+        <select id="pickupWeekday" class="styled-select">
+          <option value="">Not set yet</option>
+          <option value="0">Monday</option>
+          <option value="1">Tuesday</option>
+          <option value="2">Wednesday</option>
+          <option value="3">Thursday</option>
+          <option value="4">Friday</option>
+          <option value="5">Saturday</option>
+          <option value="6">Sunday</option>
+        </select>
+        <input type="time" id="pickupTime" class="styled-select" value="09:00" onchange="renderGeneralPreview()">
+      </div>
+      <div class="setting-description">
+        Choose the weekday your bins are picked up so the dashboard can count down to the next collection.
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="saveGeneralSettings()">💾 Save Changes</button>
+    <div class="setting-description general-preview" id="generalPreview">Live preview: --</div>
+  </div>
+
+  <!-- NOTIFICATIONS -->
+  <div class="settings-section" id="notifications">
+    <h2>Notification Settings</h2>
+
+    <div class="setting-item">
+      <div class="setting-header">
+        <h3>Push Notifications</h3>
+        <label class="toggle-switch">
+          <input type="checkbox" id="pushNotifications" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-description">
+        Receive browser push notifications for important alerts
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-header">
+        <h3>Email Notifications</h3>
+        <label class="toggle-switch">
+          <input type="checkbox" id="emailNotifications" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-description">
+        Get email alerts for bin status updates
+      </div>
+      <div class="form-group" style="margin-top: 14px;">
+        <label for="notificationEmail">Email Address</label>
+        <input type="email" id="notificationEmail" placeholder="Enter email address">
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-header">
+        <h3>Sound Alerts</h3>
+        <label class="toggle-switch">
+          <input type="checkbox" id="soundAlerts" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-description">
+        Play sound when bins reach critical levels
+      </div>
+      <button class="btn btn-secondary" onclick="testSound()" style="margin-top: 10px;">🔊 Test Sound</button>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-header">
+        <h3>Notification Frequency</h3>
+        <select id="notificationFrequency" class="styled-select">
+          <option value="instant">Instant</option>
+          <option value="hourly">Hourly Digest</option>
+          <option value="daily">Daily Summary</option>
+        </select>
+      </div>
+      <div class="setting-description">
+        Control how often you receive non-critical notifications
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="saveNotificationSettings()">💾 Save Changes</button>
+    <button class="btn btn-secondary" onclick="sendTestNotification()">📧 Send Test Notification</button>
+  </div>
+
+  <!-- APPEARANCE -->
+  <div class="settings-section" id="appearance">
+    <h2>Appearance Settings</h2>
+
+    <div class="setting-item">
+      <h3>Theme Selection</h3>
+      <div class="setting-description">
+        Choose your preferred color theme
+      </div>
+      <div class="theme-selector">
+        <div class="theme-option theme-dark active" onclick="setTheme('dark')">
+          <div style="font-size: 2rem;">🌙</div>
+          <div style="margin-top: 8px;">Dark</div>
+        </div>
+        <div class="theme-option theme-light-option" onclick="setTheme('light')">
+          <div style="font-size: 2rem;">☀️</div>
+          <div style="margin-top: 8px;">Light</div>
+        </div>
+        <div class="theme-option theme-ocean" onclick="setTheme('ocean')">
+          <div style="font-size: 2rem;">🌊</div>
+          <div style="margin-top: 8px;">Ocean</div>
+        </div>
+        <div class="theme-option theme-nature" onclick="setTheme('nature')">
+          <div style="font-size: 2rem;">🌿</div>
+          <div style="margin-top: 8px;">Nature</div>
+        </div>
+        <div class="theme-option theme-sunset" onclick="setTheme('sunset')">
+          <div style="font-size: 2rem;">🌅</div>
+          <div style="margin-top: 8px;">Sunset</div>
+        </div>
+        <div class="theme-option theme-galaxy" onclick="setTheme('galaxy')">
+          <div style="font-size: 2rem;">🌌</div>
+          <div style="margin-top: 8px;">Galaxy</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-header">
+        <h3>Auto Theme</h3>
+        <label class="toggle-switch">
+          <input type="checkbox" id="autoTheme" onchange="saveAppearanceToggle('autoTheme', this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-description">
+        Automatically switch theme based on time of day
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-header">
+        <h3>Animations</h3>
+        <label class="toggle-switch">
+          <input type="checkbox" id="animations" checked onchange="saveAppearanceToggle('animations', this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-description">
+        Enable smooth transitions and animations
+      </div>
+    </div>
+  </div>
+
+  <!-- SECURITY -->
+  <div class="settings-section" id="security">
+    <h2>Security</h2>
+
+    <div class="setting-item">
+      <div class="setting-header">
+        <h3>Password</h3>
+      </div>
+      <div class="setting-description">
+        Change the password used to sign in. Minimum 10 characters, and it must
+        combine letters and numbers.
+      </div>
+      <div id="pwMsg" style="display:none;margin:12px 0;padding:10px 14px;border-radius:10px;font-size:0.82rem;"></div>
+      <div class="form-group">
+        <label for="spCurrent">Current password</label>
+        <input type="password" id="spCurrent" autocomplete="current-password">
+      </div>
+      <div class="form-group">
+        <label for="spNew">New password</label>
+        <input type="password" id="spNew" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label for="spConfirm">Confirm new password</label>
+        <input type="password" id="spConfirm" autocomplete="new-password">
+      </div>
+      <button class="btn btn-primary" id="spSave" onclick="changePasswordFromSettings()"
+              style="margin-top: 10px;">Update Password</button>
+    </div>
+  </div>
+
+  <!-- ALERT SETTINGS -->
+  <div class="settings-section" id="alerts">
+    <h2>Alert Configuration</h2>
+
+    <div class="setting-item">
+      <div class="form-group">
+        <label>Wet Bin Alert Threshold (%)</label>
+        <input type="number" id="wetThreshold" value="80" min="50" max="95">
+      </div>
+      <div class="setting-description">
+        Trigger alert when wet bin reaches this fill level
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="form-group">
+        <label>Dry Bin Alert Threshold (%)</label>
+        <input type="number" id="dryThreshold" value="80" min="50" max="95">
+      </div>
+      <div class="setting-description">
+        Trigger alert when dry bin reaches this fill level
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="form-group">
+        <label>Critical Alert Threshold (%)</label>
+        <input type="number" id="criticalThreshold" value="90" min="80" max="100">
+      </div>
+      <div class="setting-description">
+        Send urgent notifications at this level
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="form-group">
+        <label>Alert Cooldown Period (minutes)</label>
+        <input type="number" id="alertCooldown" value="30" min="5" max="120">
+      </div>
+      <div class="setting-description">
+        Minimum time between repeat alerts for the same bin
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="saveAlertSettings()">💾 Save Changes</button>
+  </div>
+
+  <!-- SYSTEM INFO -->
+  <div class="settings-section" id="system">
+    <h2>System Information</h2>
+
+    <table class="info-table">
+      <tr>
+        <td>Device ID</td>
+        <td><code>ESP32-WS-001</code></td>
+      </tr>
+      <tr>
+        <td>Firmware Version</td>
+        <td>v1.2.3</td>
+      </tr>
+      <tr>
+        <td>Web App Version</td>
+        <td>v2.0.0</td>
+      </tr>
+      <tr>
+        <td>Last Updated</td>
+        <td id="lastUpdate">Just now</td>
+      </tr>
+      <tr>
+        <td>Connection Status</td>
+        <td><span class="badge connected" id="connBadge">● Checking...</span></td>
+      </tr>
+      <tr>
+        <td>Backend</td>
+        <td>Flask + SQLite (Local)</td>
+      </tr>
+      <tr>
+        <td>Server URL</td>
+        <td id="serverUrl">-</td>
+      </tr>
+      <tr>
+        <td>Total Users</td>
+        <td id="totalUsers">-</td>
+      </tr>
+    </table>
+
+    <h3 style="margin: 30px 0 20px 0;">Actions</h3>
+    <button class="btn btn-danger" onclick="resetBins()">🔄 Reset Bin Counters</button>
+    <button class="btn btn-secondary" onclick="exportData()">📥 Export All Data</button>
+    <button class="btn btn-secondary" onclick="window.location.href='reports.html'">📄 Generate Report</button>
+  </div>
+
+  <!-- ADVANCED SETTINGS -->
+  <div class="settings-section" id="advanced">
+    <h2>Advanced Settings</h2>
+
+    <div class="setting-item">
+      <div class="form-group">
+        <label>Data Sync Interval (seconds)</label>
+        <input type="number" id="syncInterval" value="5" min="1" max="60">
+      </div>
+      <div class="setting-description">
+        How often the Arduino sends data to the Flask server (lower = more real-time)
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-header">
+        <h3>Debug Mode</h3>
+        <label class="toggle-switch">
+          <input type="checkbox" id="debugMode">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-description">
+        Enable console logging for troubleshooting
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-header">
+        <h3>Offline Mode</h3>
+        <label class="toggle-switch">
+          <input type="checkbox" id="offlineMode">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-description">
+        Cache data locally for offline access
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="form-group">
+        <label>API Endpoint</label>
+        <input type="text" id="apiEndpoint" placeholder="">
+      </div>
+      <div class="setting-description">
+        Flask server URL (change if running on a different machine)
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="saveAdvancedSettings()">💾 Save Changes</button>
+    <button class="btn btn-danger" onclick="resetToDefaults()">⚠️ Reset to Defaults</button>
+  </div>
+</div>
+
+<!-- Settings UI Logic (no dependencies - always works) -->
+<script>
+// Tab switching
+function showSection(sectionId) {
+  document.querySelectorAll('.settings-section').forEach(function(s) { s.classList.remove('active'); });
+  document.querySelectorAll('.nav-tab').forEach(function(t) { t.classList.remove('active'); });
+  var el = document.getElementById(sectionId);
+  if (el) el.classList.add('active');
+  if (event && event.target) event.target.classList.add('active');
+}
+
+// ===== Change password (Security section) =====
+// Hits the same /api/auth/change-password endpoint as the forced dialog on the
+// login page, so the policy is enforced in one place on the server.
+function changePasswordFromSettings() {
+  var btn = document.getElementById('spSave');
+  var msg = document.getElementById('pwMsg');
+  var cur = document.getElementById('spCurrent').value;
+  var nw = document.getElementById('spNew').value;
+  var cf = document.getElementById('spConfirm').value;
+
+  function paint(text, ok) {
+    msg.textContent = text;
+    msg.style.display = 'block';
+    msg.style.background = ok ? 'rgba(39,174,96,0.10)' : 'rgba(231,76,60,0.10)';
+    msg.style.border = '1px solid ' + (ok ? 'rgba(39,174,96,0.35)' : 'rgba(231,76,60,0.35)');
+    msg.style.color = ok ? '#27ae60' : '#e74c3c';
+  }
+
+  if (!cur || !nw) { paint('Please fill in every field.', false); return; }
+  if (nw !== cf) { paint('New passwords do not match.', false); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Updating...';
+  fetch('/api/auth/change-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ current_password: cur, new_password: nw, confirm_password: cf })
+  })
+  .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, data: j }; }); })
+  .then(function (r) {
+    btn.disabled = false;
+    btn.textContent = 'Update Password';
+    if (!r.ok) { paint(r.data.error || 'Could not update the password.', false); return; }
+    paint('Password updated.', true);
+    document.getElementById('spCurrent').value = '';
+    document.getElementById('spNew').value = '';
+    document.getElementById('spConfirm').value = '';
+  })
+  .catch(function () {
+    btn.disabled = false;
+    btn.textContent = 'Update Password';
+    paint('Server not reachable. Make sure Flask is running.', false);
+  });
+}
+
+// Theme switching. localStorage stays a fast-paint CACHE only; the server
+// settings endpoint is the source of truth so the choice syncs across devices.
+var THEME_CARD_CLASS = {
+  dark: 'theme-dark',
+  light: 'theme-light-option',
+  ocean: 'theme-ocean',
+  nature: 'theme-nature',
+  sunset: 'theme-sunset',
+  galaxy: 'theme-galaxy'
+};
+
+function highlightThemeCard(themeName) {
+  var cls = THEME_CARD_CLASS[themeName];
+  document.querySelectorAll('.theme-option').forEach(function(o) {
+    o.classList.remove('active');
+    if (cls && o.classList.contains(cls)) o.classList.add('active');
+  });
+}
+
+function applyThemeLocal(themeName) {
+  var named = 'theme-' + themeName;
+  var dis = document.body.classList.contains('animations-disabled');
+  document.body.className = named + (dis ? ' animations-disabled' : '');
+  localStorage.setItem('theme', themeName); // paint cache (fast re-paint on next page)
+  highlightThemeCard(themeName);
+  window.dispatchEvent(new CustomEvent('themechange', { detail: { theme: themeName } }));
+}
+
+function setTheme(themeName) {
+  applyThemeLocal(themeName);
+  apiCall('/api/settings', 'POST', { theme: themeName })
+    .then(function() { showToast('Theme saved!', 'ok'); })
+    .catch(function() { showToast('Applied locally (server unreachable)', 'err'); });
+}
+
+// Sound test
+function testSound() {
+  var el = document.getElementById('soundAlerts');
+  if (el && !el.checked) { showToast('Sound alerts are disabled — enable them in Notifications', 'err'); return; }
+  var a = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+  a.play().catch(function(){});
+}
+
+// Notification test
+function sendTestNotification() {
+  var el = document.getElementById('pushNotifications');
+  if (el && !el.checked) { showToast('Push notifications are disabled — enable them in Notifications', 'err'); return; }
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification('Test Notification', { body: 'This is a test from Smart Waste Segregator' });
+  } else if ('Notification' in window) {
+    Notification.requestPermission().then(function(p) {
+      if (p === 'granted') new Notification('Test Notification', { body: 'Notifications enabled!' });
+    });
+  } else { alert('Notifications not supported in this browser'); }
+}
+
+// Export & Reset
+function exportData() { window.location.href = 'reports.html'; }
+function resetToDefaults() {
+  if (confirm('Reset all settings to default values?')) {
+    apiCall('/api/settings', 'POST', {
+      theme: 'dark',
+      autoTheme: 'false',
+      animations: 'true',
+      syncInterval: '5',
+      debugMode: 'false',
+      offlineMode: 'false',
+      apiEndpoint: ''
+    }).then(function() { localStorage.clear(); location.reload(); })
+      .catch(function() { showToast('Failed to reset settings', 'err'); });
+  }
+}
+
+// Advanced settings (persisted to the server, no longer localStorage-only)
+function saveAdvancedSettings() {
+  apiCall('/api/settings', 'POST', {
+    syncInterval: document.getElementById('syncInterval').value,
+    debugMode: String(document.getElementById('debugMode').checked),
+    offlineMode: String(document.getElementById('offlineMode').checked),
+    apiEndpoint: document.getElementById('apiEndpoint').value
+  }).then(function() { showToast('Advanced settings saved!', 'ok'); })
+    .catch(function() { showToast('Failed to save advanced settings', 'err'); });
+}
+
+// Appearance toggles persist immediately (single-key update)
+function saveAppearanceToggle(key, checked) {
+  var payload = {};
+  payload[key] = String(checked);
+  apiCall('/api/settings', 'POST', payload)
+    .then(function() {
+      if (key === 'autoTheme') {
+        if (checked) autoThemeTick(true);
+        else stopAutoTheme();
+      }
+      else if (key === 'animations') applyAnimationsSetting(checked);
+      showToast('Preference saved!', 'ok');
+    })
+    .catch(function(e) { showToast('Failed to save preference: ' + (e && e.message ? e.message : ''), 'err'); });
+}
+
+var TZ_MAP = { IST: 'Asia/Kolkata', EST: 'America/New_York', PST: 'America/Los_Angeles', GMT: 'Europe/London' };
+
+function padNum(n) { return String(n).padStart(2, '0'); }
+
+// Live preview for Language / Time Zone / Date Format (real-time effects)
+function renderGeneralPreview() {
+  var langEl = document.getElementById('language');
+  if (langEl) document.documentElement.lang = langEl.value; // instant, per-page language effect
+  var el = document.getElementById('generalPreview');
+  if (!el) return;
+  var tzSel = document.getElementById('timezone');
+  var fmtSel = document.getElementById('dateFormat');
+  if (!tzSel || !fmtSel) return;
+  var tz = TZ_MAP[tzSel.value] || 'UTC';
+  var parts = [];
+  try {
+    parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+    }).formatToParts(new Date());
+  } catch (err) { return; }
+  function g(type) {
+    var m = parts.find(function(p) { return p.type === type; });
+    return m ? m.value : '00';
+  }
+  var dateStr = fmtSel.value
+    .replace('YYYY-MM-DD', g('year') + '-' + g('month') + '-' + g('day'))
+    .replace('MM/DD/YYYY', g('month') + '/' + g('day') + '/' + g('year'))
+    .replace('DD/MM/YYYY', g('day') + '/' + g('month') + '/' + g('year'));
+  el.textContent = 'Live preview: ' + dateStr + ' ' + g('hour') + ':' + g('minute') + ':' + g('second') + ' ' + tzSel.value;
+}
+
+// Auto theme: switches light/dark by the hour while enabled (each switch persists)
+var autoTimer = null;
+var autoAppliedTheme = null;
+
+function autoThemeTick(force) {
+  if (!document.getElementById('autoTheme') || !document.getElementById('autoTheme').checked) { stopAutoTheme(); return; }
+  var h = new Date().getHours();
+  var target = (h >= 7 && h < 19) ? 'light' : 'dark';
+  if (force || autoAppliedTheme !== target) {
+    autoAppliedTheme = target;
+    applyThemeLocal(target);
+    apiCall('/api/settings', 'POST', { theme: target }).catch(function() {});
+  }
+  if (!autoTimer) autoTimer = setInterval(autoThemeTick, 60000);
+}
+
+function stopAutoTheme() { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
+
+// Animations on/off: instant page-wide effect (see themes.css)
+function applyAnimationsSetting(checked) {
+  document.body.classList.toggle('animations-disabled', !checked);
+}
+
+function isValidEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+// Timestamp updater (+ live General preview)
+setInterval(function() {
+  var el = document.getElementById('lastUpdate');
+  if (el) el.textContent = new Date().toLocaleTimeString();
+  renderGeneralPreview();
+}, 1000);
+
+// Fast paint from cache immediately; the server settings fetch below is the
+// source of truth and re-applies the account's theme if the cache is stale.
+var savedTheme = localStorage.getItem('theme') || 'dark';
+try { savedTheme = JSON.parse(savedTheme); } catch (e) {}
+document.body.className = 'theme-' + savedTheme;
+highlightThemeCard(savedTheme);
+
+// Derive server URL from the current origin (no hardcoded localhost).
+var serverOrigin = window.location.origin;
+var serverUrlEl = document.getElementById('serverUrl');
+if (serverUrlEl) serverUrlEl.textContent = serverOrigin;
+var apiEndpointEl = document.getElementById('apiEndpoint');
+if (apiEndpointEl) { apiEndpointEl.value = serverOrigin; apiEndpointEl.placeholder = serverOrigin; }
+</script>
+
+<!-- Flask API Settings (saves to server) -->
+<script>
+function apiCall(url, method, data) {
+  var opts = { method: method || 'GET', headers: {'Content-Type':'application/json'}, credentials: 'include' };
+  if (data) opts.body = JSON.stringify(data);
+  return fetch(url, opts).then(function(r) {
+    return r.json().then(function(j) {
+      if (!r.ok) throw new Error(j && j.error ? j.error : ('HTTP ' + r.status));
+      return j;
+    });
+  });
+}
+
+function showToast(msg, type) {
+  window.toastNotify(String(msg), type);
+}
+
+function saveGeneralSettings() {
+  apiCall('/api/settings', 'POST', {
+    language: document.getElementById('language').value,
+    timezone: document.getElementById('timezone').value,
+    dateFormat: document.getElementById('dateFormat').value,
+    pickupWeekday: document.getElementById('pickupWeekday').value,
+    pickupTime: document.getElementById('pickupTime').value || '09:00'
+  }).then(function() {
+    renderGeneralPreview();
+    showToast('General settings saved!', 'ok');
+  }).catch(function(e) { showToast('Failed to save settings: ' + (e && e.message ? e.message : ''), 'err'); });
+}
+
+function saveNotificationSettings() {
+  var email = document.getElementById('notificationEmail').value.trim();
+  if (email && !isValidEmail(email)) { showToast('Please enter a valid email address', 'err'); return; }
+  apiCall('/api/settings', 'POST', {
+    pushNotifications: String(document.getElementById('pushNotifications').checked),
+    emailNotifications: String(document.getElementById('emailNotifications').checked),
+    soundAlerts: String(document.getElementById('soundAlerts').checked),
+    notificationFrequency: document.getElementById('notificationFrequency').value,
+    notificationEmail: email
+  }).then(function() { showToast('Notification settings saved!', 'ok'); })
+    .catch(function(e) { showToast('Failed to save: ' + (e && e.message ? e.message : ''), 'err'); });
+}
+
+function saveAlertSettings() {
+  apiCall('/api/settings', 'POST', {
+    wetThreshold: document.getElementById('wetThreshold').value,
+    dryThreshold: document.getElementById('dryThreshold').value,
+    criticalThreshold: document.getElementById('criticalThreshold').value,
+    alertCooldown: document.getElementById('alertCooldown').value
+  }).then(function() { showToast('Alert settings saved!', 'ok'); })
+    .catch(function() { showToast('Failed to save', 'err'); });
+}
+
+function resetBins() {
+  if (confirm('Reset all bin data? This cannot be undone.')) {
+    apiCall('/api/bins/reset', 'POST').then(function() { showToast('Bins reset successfully!', 'ok'); })
+      .catch(function() { showToast('Failed to reset bins', 'err'); });
+  }
+}
+
+// Check server connection on load
+fetch('/api/bins', {credentials:'include'}).then(function(r) {
+  if (r.ok) {
+    var b = document.getElementById('connBadge');
+    if (b) { b.textContent = '● Connected'; b.className = 'badge connected'; }
+  }
+}).catch(function() {
+  var b = document.getElementById('connBadge');
+  if (b) { b.textContent = '● Offline'; b.style.background = 'rgba(255,68,68,0.2)'; b.style.color = 'var(--danger)'; }
+});
+
+// Load saved settings from server (source of truth; localStorage re-applied
+// above is only a fast-paint cache)
+apiCall('/api/settings', 'GET').then(function(data) {
+  if (!data) return;
+  if (data.language) document.getElementById('language').value = data.language;
+  if (data.timezone) document.getElementById('timezone').value = data.timezone;
+  if (data.dateFormat) document.getElementById('dateFormat').value = data.dateFormat;
+  if (data.pickupWeekday !== undefined && data.pickupWeekday !== null) document.getElementById('pickupWeekday').value = data.pickupWeekday;
+  if (data.pickupTime) document.getElementById('pickupTime').value = data.pickupTime;
+  if (data.pushNotifications) document.getElementById('pushNotifications').checked = data.pushNotifications === 'true';
+  if (data.emailNotifications) document.getElementById('emailNotifications').checked = data.emailNotifications === 'true';
+  if (data.soundAlerts) document.getElementById('soundAlerts').checked = data.soundAlerts === 'true';
+  if (data.notificationFrequency) document.getElementById('notificationFrequency').value = data.notificationFrequency;
+  if (data.notificationEmail) document.getElementById('notificationEmail').value = data.notificationEmail;
+  if (data.wetThreshold) document.getElementById('wetThreshold').value = data.wetThreshold;
+  if (data.dryThreshold) document.getElementById('dryThreshold').value = data.dryThreshold;
+  if (data.criticalThreshold) document.getElementById('criticalThreshold').value = data.criticalThreshold;
+  if (data.alertCooldown) document.getElementById('alertCooldown').value = data.alertCooldown;
+  if (data.syncInterval) document.getElementById('syncInterval').value = data.syncInterval;
+  if (data.debugMode) document.getElementById('debugMode').checked = data.debugMode === 'true';
+  if (data.offlineMode) document.getElementById('offlineMode').checked = data.offlineMode === 'true';
+  if (data.autoTheme) document.getElementById('autoTheme').checked = data.autoTheme === 'true';
+  if (data.animations) document.getElementById('animations').checked = data.animations === 'true';
+  if (data.apiEndpoint) {
+    var e = document.getElementById('apiEndpoint');
+    if (e) { e.value = data.apiEndpoint; e.placeholder = data.apiEndpoint; }
+  }
+  // Server theme wins over the local cache (cross-device sync)
+  if (data.theme) {
+    var cached = localStorage.getItem('theme') || 'dark';
+    try { cached = JSON.parse(cached); } catch (e) {}
+    if (data.theme !== cached) applyThemeLocal(data.theme);
+    else highlightThemeCard(data.theme);
+  }
+  // Re-apply real-time preferences from the server
+  renderGeneralPreview();
+  applyAnimationsSetting(data.animations === 'true');
+  if (data.autoTheme === 'true') autoThemeTick(true);
+  if (data.debugMode === 'true') console.info('[settings] debug mode — loaded config', data);
+}).catch(function() { console.log('Could not load settings - using defaults'); });
+</script>
+
+</body>
+</html>
